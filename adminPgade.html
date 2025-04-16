@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>Admin</h2>
+      <ul>
+        <li><a href="#" id="dashboardLink">Dashboard</a></li>
+        <li><a href="#" id="manageUsersLink">Manage Users</a></li>
+        <li><a href="#" id="addPostLink">Add Post</a></li>
+        <li><a href="#" id="testimonialsLink">Testimonials</a></li>
+        <li><a href="#" id="winnersLink">Winners</a></li>
+        <li><a href="#">Logout</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 id="welcomeMessage">Welcome, Admin!</h1>
+        <p id="welcomeText">Select an option from the sidebar to get started.</p>
+      
+
+<!-- User Detail Modal -->
+<div id="userModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>User Details</h3>
+      <p><strong>Name:</strong> <span id="modalName"></span></p>
+      <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+    </div>
+  </div>
+  
+
+
+        <!-- Manage Users Section -->
+        <section id="manageUsersSection" style="display: none;">
+            <h2>Manage Users</h2>
+            <input
+            type="text"
+            id="searchInput"
+            placeholder="Search by name or email"
+            onkeyup="searchUsers()"
+            style="padding: 8px; width: 300px; margin-bottom: 15px;"
+          />
+          
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="selectAll" /></th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="userList">
+                <!-- Users will be loaded here via JavaScript -->
+              </tbody>
+              <button onclick="sendBulkEmail()" class="bulk-email-btn">Send Bulk Email</button>
+            </table>
+          </section>
+          
+      
+        <!-- Add Post Section -->
+        <section id="addPostSection" style="display: none;">
+          <h2>Add New Post</h2>
+          <form class="post-form" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="title">Post Title:</label>
+              <input type="text" id="title" name="title" required />
+            </div>
+      
+            <div class="form-group">
+              <label for="image">Upload Image:</label>
+              <input type="file" id="image" name="image" accept="image/*" required />
+            </div>
+      
+            <div class="form-group">
+              <label for="content">Content:</label>
+              <textarea id="content" name="content" rows="5" required></textarea>
+            </div>
+      
+            <button type="submit" class="btn">Post</button>
+          </form>
+      
+          <div class="post-preview" style="margin-top: 40px;">
+            <h2>Live Preview</h2>
+            <div id="previewBox"></div>
+          </div>
+        </section>
+      
+        <!-- Testimonials Section -->
+        <section id="testimonialsSection" style="display: none;">
+          <h2>Testimonials</h2>
+          <p>Here you can manage user testimonials...</p>
+        </section>
+      
+        <!-- Winners Section -->
+        <section id="winnersSection" style="display: none;">
+          <h2>Winners</h2>
+          <p>List of recent winners...</p>
+        </section>
+      </main>
+      
+  </div>
+
+  <div id="emailModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeEmailModal()">&times;</span>
+      <h2>Send Email</h2>
+      <form id="emailForm">
+        <input type="hidden" id="emailRecipients" />
+        <label for="emailSubject">Subject:</label>
+        <input type="text" id="emailSubject" required />
+        <label for="emailMessage">Message:</label>
+        <textarea id="emailMessage" rows="5" required></textarea>
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+  
+
+  <script>
+    const sections = {
+      dashboard: ['welcomeMessage', 'welcomeText'],
+      manageUsers: ['manageUsersSection'],
+      addPost: ['addPostSection'],
+      testimonials: ['testimonialsSection'],
+      winners: ['winnersSection']
+    };
+  
+    function showSection(keys) {
+      // Hide all
+      Object.values(sections).flat().forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+  
+      // Show selected
+      keys.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'block';
+      });
+    }
+  
+    // Event listeners
+    document.getElementById('dashboardLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(sections.dashboard);
+    });
+  
+    document.getElementById('manageUsersLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(sections.manageUsers);
+    });
+  
+    document.getElementById('addPostLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(sections.addPost);
+    });
+  
+    document.getElementById('testimonialsLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(sections.testimonials);
+    });
+  
+    document.getElementById('winnersLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(sections.winners);
+    });
+  
+    // Add preview logic (already explained earlier)
+    const form = document.querySelector(".post-form");
+    const previewBox = document.getElementById("previewBox");
+  
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+  
+      const title = document.getElementById("title").value;
+      const content = document.getElementById("content").value;
+      const image = document.getElementById("image").files[0];
+  
+      if (image) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          previewBox.innerHTML = `
+            <h3>${title}</h3>
+            <img src="${reader.result}" alt="Post Image" style="max-width: 100%; border-radius: 8px;" />
+            <p>${content}</p>
+          `;
+        };
+        reader.readAsDataURL(image);
+      }
+    });
+
+
+    const users = [
+    { id: 1, name: "Jane Doe", email: "jane@example.com" },
+    { id: 2, name: "John Smith", email: "john@example.com" },
+    { id: 3, name: "Alice Johnson", email: "alice@example.com" }
+  ];
+
+  function renderUsers(filteredUsers = users) {
+  const userList = document.getElementById("userList");
+  userList.innerHTML = "";
+
+  filteredUsers.forEach((user, index) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td><input type="checkbox" class="user-checkbox" data-email="${user.email}"></td>
+      <td>${user.name}</td>
+      <td>${user.email}</td>
+      <td>
+         <button class="view-btn" onclick="viewUser(${index})">View</button>
+         <button class="delete-btn" onclick="deleteUser(${index})">Delete</button>
+         <button class="mail-btn" onclick="sendSingleEmail('${user.email}')">Mail</button>
+      </td>
+    `;
+
+    userList.appendChild(row);
+  });
+}
+
+
+
+
+  function deleteUser(index) {
+    if (confirm("Are you sure you want to delete this user?")) {
+      users.splice(index, 1);
+      renderUsers();
+    }
+  }
+
+  // Trigger user rendering on page load
+  document.addEventListener("DOMContentLoaded", renderUsers);
+
+
+  function viewUser(index) {
+  const user = users[index];
+  document.getElementById("modalName").textContent = user.name;
+  document.getElementById("modalEmail").textContent = user.email;
+  document.getElementById("userModal").style.display = "block";
+}
+
+function closeModal() {
+  document.getElementById("userModal").style.display = "none";
+}
+
+
+function searchUsers() {
+  const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+
+  const filtered = users.filter(user =>
+    user.name.toLowerCase().includes(searchTerm) ||
+    user.email.toLowerCase().includes(searchTerm)
+  );
+
+  renderUsers(filtered);
+}
+
+
+function sendSingleEmail(email) {
+  openEmailModal([email]);
+}
+
+function sendBulkEmail() {
+  const selectedEmails = Array.from(document.querySelectorAll(".user-checkbox:checked"))
+    .map(checkbox => checkbox.dataset.email);
+
+  if (selectedEmails.length === 0) {
+    alert("Select at least one user to email.");
+    return;
+  }
+
+  openEmailModal(selectedEmails);
+}
+
+function openEmailModal(emails) {
+  document.getElementById("emailRecipients").value = emails.join(",");
+  document.getElementById("emailSubject").value = "";
+  document.getElementById("emailMessage").value = "";
+  document.getElementById("emailModal").style.display = "block";
+}
+
+function closeEmailModal() {
+  document.getElementById("emailModal").style.display = "none";
+}
+
+document.getElementById("emailForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const recipients = document.getElementById("emailRecipients").value.split(",");
+  const subject = document.getElementById("emailSubject").value;
+  const message = document.getElementById("emailMessage").value;
+
+  // TODO: Send to backend API
+  console.log("Sending to:", recipients);
+  console.log("Subject:", subject);
+  console.log("Message:", message);
+
+  alert("Email sent successfully!");
+  closeEmailModal();
+});
+
+document.getElementById("selectAll").addEventListener("change", function () {
+  const checkboxes = document.querySelectorAll(".user-checkbox");
+  checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+});
+
+
+  </script>
+  
+
+</body>
+</html>
