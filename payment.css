@@ -1,0 +1,98 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .payment-container {
+    width: 90%;
+    max-width: 500px;
+    background: white;
+    margin: 80px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    text-align: center;
+    color: #333;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  input,
+  select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+  
+  .pay-btn {
+    background-color: #f6b827;
+    color: #fff;
+    padding: 12px;
+    width: 100%;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .pay-btn:hover {
+    background-color: #e0a800;
+  }
+  
+  #messageBox {
+    margin-top: 15px;
+    text-align: center;
+  }
+  
+
+  .header {
+    background-color: #f6b827;
+    margin-top: 0;
+    box-shadow: 0 2px 8px rgba(48, 46, 46, 0.1);
+    padding: 0;
+    width: 100%;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;              /* Make sure it sticks to the top */
+    left: 0;
+    z-index: 1000;
+  
+    }
+    
+    .container {
+  
+      border-radius: 20px;
+      width: 90%;
+      padding: 0 20px;
+      display: flex;
+      margin-top: 0px;
+      justify-content: space-between;
+      align-items: center;
+      background-color: white;
+      height: 70px;
+  
+    }
+  
+    .logo {
+      padding-left: 100px;
+      width: 150px;
+    }
+    
