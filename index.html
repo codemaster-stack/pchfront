@@ -1,310 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PCH Style Sweepstakes</title>
-  <link rel="stylesheet" href="./index.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sweepstakes Home</title>
+  <link rel="stylesheet" href="index.css">
 </head>
-
 <body>
+
   <!-- Header -->
-  <header class="header"> 
-    <div class="container header-container">
-      <img src="images/pch.jpg" alt="Logo" class="logo">
-  
-      <!-- Greeting Message -->
-      <div id="greeting" class="greeting-box"></div>
-  
-      <!-- Navigation Menu -->
-      <nav class="nav">
-        <ul class="nav-list">
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Sweepstakes</a></li>
-          <li><a href="#">Winners</a></li>
-          <li><a href="#">Points</a></li>
-          <li><a href="#">Logout</a></li>
-        </ul>
+  <header class="header">
+    <div class="container">
+    <img src="images/pch.jpg" alt="Logo" class="logo">
+      <h1 class="Tlogo">PCH Sweepstakes</h1>
+      <nav>
+        <a href="login.html" class="btn">Login</a>
+        <a href="signup.html" class="btn">Signup</a>
       </nav>
-  
-      <!-- New Icons Area -->
-      <div class="user-icons">
-        <!-- Notification Bell -->
-        <div class="notification">
-          <span class="bell-icon">&#128276;</span>
-          <span class="badge" id="notificationCount">2</span>
-        </div>
-  
-        <!-- Profile Picture -->
-        <div class="profile">
-          <img src="images/pch3d.jpg" alt="Profile" class="profile-pic" />
-          <!-- Optional initials version:
-          <div class="profile-initials">JD</div> -->
-        </div>
-      </div>
     </div>
   </header>
-  
 
   <!-- Hero Section -->
-<section class="hero">
-    <div class="hero-overlay">
-        <div class="hero-content">
-            <h1>Win Up to $100,000 Instantly!</h1>
-            <p>Enter our daily sweepstakes for a chance to change your life today.</p>
-            <a href="#" class="btn-enter">Enter Now</a>
-          
-            <!-- Countdown Timer -->
-            <div class="countdown">
-              <p>Next draw in: <span id="timer">Loading...</span></p>
-            </div>
-        </div>   
-    </div>
-</section>
-
-<section class="how-it-works" id="how-it-works">
-    <div class="container">
-      <h2>How It Works</h2>
-      <div class="steps">
-        <div class="step">
-          <img src="images/pcb.jpg" alt="Step 1 Icon" />
-          <h3>1. Sign Up</h3>
-          <p>Create your free account to get started.</p>
-        </div>
-        <div class="step">
-          <img src="images/enterph.jpg" alt="Step 2 Icon" />
-          <h3>2. Enter Daily</h3>
-          <p>Use your entry to participate in today’s draw.</p>
-        </div>
-        <div class="step">
-          <img src="images/mainent.jpg" alt="Step 3 Icon" />
-          <h3>3. Win Big</h3>
-          <p>If you're selected, you win based on your stake!</p>
-        </div>
-      </div>
+  <section class="hero">
+    <div class="hero-content">
+      <h2>Win Big Every Day!</h2>
+      <p>Enter our daily sweepstakes and stand a chance to win amazing prizes.</p>
+      <a href="signup.html" class="btn-main">Get Started</a>
     </div>
   </section>
-  <section class="testimonial-section">
-    <h2>What Our Winners Say</h2>
-    <div class="testimonial-slider" id="testimonialSlider">
-      <div class="testimonial-slide active">
-        <!-- Slide 1 Testimonials -->
-        <div class="testimonial">
-          <img src="images/testimo.jpg" alt="Winner 1">
-          <p>“I just won $10,000! Thanks LuckyWin!”</p>
-          <span>- Sarah J.</span>
-        </div>
-        <div class="testimonial">
-          <img src="images/enterph.jpg" alt="Winner 2">
-          <p>“Unbelievable experience. I’m telling everyone!”</p>
-          <span>- Mike T.</span>
-        </div>
-      </div>
-  
-      <div class="testimonial-slide">
-        <!-- Slide 2 Testimonials -->
-        <div class="testimonial">
-          <img src="images/testimo.jpg" alt="Winner 3">
-          <p>“I never thought I'd win. Dreams do come true!”</p>
-          <span>- Diana L.</span>
-        </div>
-        <div class="testimonial">
-          <img src="images/testimo.jpg" alt="Winner 4">
-          <p>“Got my check in the mail! Love this site.”</p>
-          <span>- Carl P.</span>
-        </div>
-      </div>
-  
-      <div class="testimonial-slide">
-        <!-- Slide 3 Testimonials -->
-        <div class="testimonial">
-          <img src="images/pch.jpg" alt="Winner 5">
-          <p>“Easy to use and totally legit!”</p>
-          <span>- Janet Q.</span>
-        </div>
-        <div class="testimonial">
-          <img src="images/testimo.jpg" alt="Winner 6">
-          <p>“I entered every day and finally won!”</p>
-          <span>- Travis K.</span>
-        </div>
-      </div>
-    </div>
-  </section>
-  
-  
-  
-  <section class="testimonials">
-    <h2>What Our Winners Say</h2>
-    <div class="testimonial-container" id="testimonial-container">
-      <img src="images/testimo.jpg" alt="Winner Photo" class="testimonial-img" id="testimonial-img">
-      <p id="testimonial-text">"I couldn't believe it! I entered just once and won $5,000. Thank you!"</p>
-      <h4 id="testimonial-name">- Sarah M., New York</h4>
-    </div>
-  
-  
-  <footer class="footer">
-    <div class="footer-container">
-      <div class="footer-brand">
-        <h2>LuckyWin</h2>
-        <p>Enter. Play. Win big every day.</p>
-      </div>
-  
-      <div class="footer-links">
-        <h3>Quick Links</h3>
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/sweepstakes">Sweepstakes</a></li>
-          <li><a href="/winners">Winners</a></li>
-          <li><a href="/contact">Contact</a></li>
-        </ul>
-      </div>
-  
-      <div class="footer-contact">
-        <h3>Contact Us</h3>
-        <p><a href="/">Email: support@luckywin.com</a></p>
-        <p>Phone: +1-800-LUCKYWIN</p>
-        <div class="footer-socials">
-          <a href="#"><img src="images/f.jpg" alt="Facebook" /></a>
-          <a href="#"><img src="images/twinter.jpg" alt="Twitter" /></a>
-          <a href="#"><img src="images/inst.jpg" alt="Instagram" /></a>
-        </div>
-      </div>
-    </div>
-  
-    <div class="footer-bottom">
-      <p>&copy; 2025 LuckyWin Sweepstakes. All rights reserved.</p>
-    </div>
-  </footer>
-  
-  
-
-  <script>
-    // Set the countdown to midnight every day
-    function getNextMidnight() {
-      const now = new Date();
-      const nextMidnight = new Date();
-      nextMidnight.setHours(24, 0, 0, 0); // next midnight
-      return nextMidnight.getTime();
-    }
-  
-    function startCountdown() {
-      const countdownDate = getNextMidnight();
-  
-      const timerElement = document.getElementById("timer");
-  
-      const x = setInterval(function () {
-        const now = new Date().getTime();
-        const distance = countdownDate - now;
-  
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-  
-        timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
-  
-        if (distance < 0) {
-          clearInterval(x);
-          timerElement.innerHTML = "00h 00m 00s";
-        }
-      }, 1000);
-    }
-  
-    startCountdown();
-
-
-    const testimonials = [
-    {
-      image: "images/winner1.jpg",
-      text: "\"I couldn't believe it! I entered just once and won $5,000. Thank you!\"",
-      name: "- Sarah M., New York"
-    },
-    {
-      image: "images/winner2.jpg",
-      text: "\"This sweepstakes changed my life. I used the prize to start my dream business.\"",
-      name: "- James K., Texas"
-    },
-    {
-      image: "images/winner3.jpg",
-      text: "\"I never thought I’d win. The money helped pay my son’s college tuition!\"",
-      name: "- Amanda R., Florida"
-    },
-    {
-      image: "images/winner4.jpg",
-      text: "\"So grateful for this opportunity! The support team was amazing too.\"",
-      name: "- Emmanuel A., Lagos"
-    }
-  ];
-
-  let index = 0;
-
-  function showTestimonial() {
-    const imgEl = document.getElementById("testimonial-img");
-    const textEl = document.getElementById("testimonial-text");
-    const nameEl = document.getElementById("testimonial-name");
-
-    const current = testimonials[index];
-    imgEl.src = current.image;
-    textEl.textContent = current.text;
-    nameEl.textContent = current.name;
-
-    index = (index + 1) % testimonials.length;
-  }
-
-  // Show the first testimonial on load
-  showTestimonial();
-
-  // Change testimonial every 1 hour (3600000 milliseconds)
-  setInterval(showTestimonial, 3600000);
-
-
-
-
-
-  window.onload = function () {
-    const userName = localStorage.getItem("userName") || "Guest";
-
-    const now = new Date();
-    const hour = now.getHours();
-    let timeOfDay;
-
-    if (hour < 12) {
-      timeOfDay = "Good morning";
-    } else if (hour < 18) {
-      timeOfDay = "Good afternoon";
-    } else {
-      timeOfDay = "Good evening";
-    }
-
-    const message = `${timeOfDay}, ${userName}! 👋 Welcome back to our sweepstakes site. 🎉`;
-
-    const greetingBox = document.getElementById("greeting");
-    greetingBox.textContent = message;
-    greetingBox.style.display = "block";
-
-    setTimeout(() => {
-      greetingBox.style.display = "none";
-    }, 6000);
-  };
-
-  </script>
-  
-
-
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-  (function(){
-  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-  s1.async=true;
-  s1.src='https://embed.tawk.to/6800095dea5f5e190c3496a6/1ip0295t6';
-  s1.charset='UTF-8';
-  s1.setAttribute('crossorigin','*');
-  s0.parentNode.insertBefore(s1,s0);
-  })();
-  </script>
-  <!--End of Tawk.to Script-->
-
-
 
 </body>
 </html>

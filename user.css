@@ -1,0 +1,381 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .notification {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .profile {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #fff;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+  
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+  }
+  
+  .header {
+    background-color: #f6b827;
+    box-shadow: 0 2px 8px rgba(48, 46, 46, 0.1);
+    padding: 0; /* remove padding to fully control spacing with height */
+    width: 100%;
+    height: 100px;
+    display: flex;               /* Enable flex */
+    justify-content: center;     /* Horizontally center child */
+    align-items: center;         /* Vertically center child */
+    position: relative;
+    position: fixed;          /* Make sure it's in flow */
+    z-index: 1000;
+  }
+  
+  .container {
+    border-radius: 20px;
+    width: 90%;
+    padding: 0 20px;
+    display: flex;
+    margin-top: 15px;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    height: 70px;
+  }
+
+  .logo {
+    padding-left: 100px;
+    width: 150px;
+  }
+  
+  .nav-list {
+    padding-right: 100px;
+    list-style: none;
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-list a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  
+  .nav-list a:hover {
+    color: #007bff;
+  }
+
+  
+
+
+
+  .hero {
+    background-image: url('images/pch\ bana.jpg'); /* Replace with your own image if you have one */
+    background-size: cover;
+    background-position: center;
+    height: 80vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .hero-overlay {
+    background: rgba(66, 63, 63, 0.5);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .hero-content {
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+  }
+  
+  .hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  
+  .btn-enter {
+    background: #ffcc00;
+    color: #000;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 30px;
+    transition: background 0.3s;
+  }
+  
+  .btn-enter:hover {
+    background: #e6b800;
+  }
+
+  
+
+  .countdown {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #fff;
+  }
+
+  
+
+
+
+  .how-it-works {
+    background: #f8f8f8;
+    padding: 50px 20px;
+    text-align: center;
+  }
+  
+  .how-it-works h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+  
+  .steps {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .step {
+    background: #fff;
+    padding: 20px;
+    flex: 1 1 250px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    transition: 0.3s ease;
+  }
+  
+  .step:hover {
+    transform: translateY(-5px);
+  }
+  
+  .step img {
+    width: 80px;
+    margin-bottom: 15px;
+  }
+
+  .testimonials {
+    padding: 60px 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+  
+  .testimonials h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: #222;
+  }
+  
+  .testimonial-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  
+  .testimonial-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  
+  .testimonial-container p {
+    font-size: 16px;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  
+  .testimonial-container h4 {
+    font-size: 14px;
+    color: #555;
+    font-weight: 600;
+  }
+  
+  
+
+  .footer {
+    background-color: #fab83e;
+    color: #160101;
+    padding: 40px 20px 20px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  .footer-brand h2 {
+    color: #0b0901;
+  }
+  
+  .footer-links ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer-links ul li {
+    margin-bottom: 8px;
+  }
+  
+  .footer-links a {
+    color: #100101;
+    text-decoration: none;
+  }
+  
+  .footer-links a:hover {
+    color: #100d01;
+  }
+  
+  .footer-contact p {
+    margin: 6px 0;
+  }
+  
+  .footer-socials a {
+    margin-right: 10px;
+  }
+  
+  .footer-socials img {
+    width: 24px;
+    height: 24px;
+    filter: invert(1);
+  }
+  
+  .footer-bottom {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 14px;
+    color: #100101;
+  }
+  
+
+
+
+  .testimonial-section {
+    padding: 50px 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+  
+  .testimonial-section h2 {
+    margin-bottom: 30px;
+    font-size: 2rem;
+  }
+  
+  .testimonial-slider {
+    overflow: hidden;
+    position: relative;
+    max-width: 1000px;
+    margin: auto;
+  }
+  
+  .testimonial-slide {
+    display: none;
+    animation: fadeIn 1s ease-in-out;
+  }
+  
+  .testimonial-slide.active {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .testimonial {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 45%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+  }
+  
+  .testimonial:hover {
+    transform: translateY(-5px);
+  }
+  
+  .testimonial img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+  
+  .testimonial p {
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  
+  .testimonial span {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  
+
+
+
+
+  .greeting-box {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #f6b827;
+    color: #000;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    z-index: 9999;
+    display: none;
+    animation: fadein 0.5s ease, fadeout 0.5s ease 5s;
+  }
+  
+  @keyframes fadein {
+    from { opacity: 0; top: 0; }
+    to { opacity: 1; top: 20px; }
+  }
+  
+  @keyframes fadeout {
+    from { opacity: 1; top: 20px; }
+    to { opacity: 0; top: 0; }
+  }
+  
