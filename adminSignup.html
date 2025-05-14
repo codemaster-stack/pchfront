@@ -1,0 +1,36 @@
+<form id="adminSignupForm"> 
+  <input type="text" id="adminUserName" placeholder="User Name" required>
+  <input type="email" id="adminEmail" placeholder="Admin Email" required>
+  <input type="password" id="adminPassword" placeholder="Password" required>
+  <button type="submit">Create Admin</button>
+</form>
+
+<script>
+document.getElementById('adminSignupForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const username = document.getElementById('adminUserName').value.trim(); // Get username
+  const email = document.getElementById('adminEmail').value.trim();
+  const password = document.getElementById('adminPassword').value;
+
+  try {
+    const res = await fetch('http://localhost:5000/api/admin/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password }) // Include username in the payload
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert('Admin registered successfully!');
+      // Redirect to login page after successful registration
+      window.location.href = 'login.html';  // Adjust the path if necessary
+    } else {
+      alert(data.message || 'Admin signup failed.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Something went wrong');
+  }
+});
+</script>

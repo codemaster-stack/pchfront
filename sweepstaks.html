@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sweepstakes Stake Choice</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .stake-options {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .stake-option {
+      width: 150px;
+      height: 200px;
+      object-fit: cover;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: transform 0.3s, border 0.3s;
+    }
+
+    .stake-option:hover {
+      transform: scale(1.05);
+    }
+
+    .selected {
+      border: 4px solid #007bff;
+    }
+
+    .result {
+      margin-top: 30px;
+      font-size: 1.2rem;
+      color: green;
+    }
+
+    .container {
+
+border-radius: 20px;
+width: 90%;
+padding: 0 20px;
+display: flex;
+margin-top: 0px;
+justify-content: space-between;
+align-items: center;
+background-color: white;
+height: 70px;
+
+}
+  
+.logo {
+    padding-left: 100px;
+    width: 150px;
+  }
+  .header {
+  background-color: #f6b827;
+  margin-top: 0;
+  box-shadow: 0 2px 8px rgba(48, 46, 46, 0.1);
+  padding: 0;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;              /* Make sure it sticks to the top */
+  left: 0;
+  z-index: 1000;
+
+  }
+
+  .text {
+    margin-top: 100px;
+    font-size: 2rem;
+    color: #333;
+  }
+
+  </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+        <img src="images/pch.jpg" alt="Logo" class="logo">
+          <h1 class="Tlogo">PCH Sweepstakes</h1>
+         
+        </div>
+      </header>
+  <h1 class="text">Choose Your Stake</h1>
+
+  <div class="stake-options" id="stakeContainer">
+    <!-- Stake images will be injected here by JS -->
+  </div>
+
+  <div class="result" id="resultMessage"></div>
+
+  <script>
+    const stakeContainer = document.getElementById('stakeContainer');
+    const resultMessage = document.getElementById('resultMessage');
+
+    for (let i = 1; i <= 10; i++) {
+      const img = document.createElement('img');
+      img.src = `https://via.placeholder.com/150x200?text=Stake+${i}`;
+      img.alt = `Stake ${i}`;
+      img.classList.add('stake-option');
+      img.dataset.stake = `Stake ${i}`;
+
+      img.addEventListener('click', () => {
+        document.querySelectorAll('.stake-option').forEach(img => img.classList.remove('selected'));
+        img.classList.add('selected');
+        resultMessage.textContent = `You selected: ${img.dataset.stake}`;
+      });
+
+      stakeContainer.appendChild(img);
+    }
+  </script>
+
+</body>
+</html>

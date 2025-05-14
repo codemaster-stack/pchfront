@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Successful</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      background-color: #f4f9f8;
+    }
+    .success {
+      color: green;
+      font-size: 2rem;
+    }
+    .info {
+      margin-top: 20px;
+      color: #444;
+    }
+    .loading {
+      display: none;
+      margin-top: 20px;
+      color: #007bff;
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+    <div class="success" id="successMessage" style="display:none;">🎉 Deposit Successful!</div>
+    <div class="info" id="infoText" style="display:none;">You will be redirected to your dashboard shortly...</div>
+    <div class="loading" id="loadingMessage">⏳ Verifying payment...</div>
+  
+    <script> 
+        console.log('Script loaded');
+      
+        //  1. Extract token from URL and store in localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenFromURL = urlParams.get('token');
+        if (tokenFromURL) {
+          localStorage.setItem('token', tokenFromURL);
+          console.log('Token saved to localStorage from URL');
+        }
+      
+        async function showMessage(message, isError = false) {
+          alert((isError ? ' Error: ' : ' ') + message);
+        }
+      
+        async function verifyDeposit() {
+          console.log('Running verifyDeposit');
+      
+          const params = new URLSearchParams(window.location.search);
+          const reference = params.get('reference') || params.get('ref');
+          console.log('Reference from URL:', reference);
+      
+          const token = localStorage.getItem('token');
+          console.log('Token from localStorage:', token);
+      
+          if (reference && token) {
+            document.getElementById('loadingMessage').style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('infoText').style.display = 'none';
+      
+            try {
+              const backendUrl = 'https://pch-z6ny.onrender.com'; // Replace ngrokUrl
+
+const response = await fetch(`${backendUrl}/api/wallet/verify-payment`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ reference }), // ← Use `reference`, not `ref`
+});
+
+      
+              const data = await response.json();
+              console.log('Verification Response:', data);
+      
+              if (response.ok && data.status === 'success') {
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('infoText').style.display = 'block';
+      
+                showMessage('Payment verified and wallet updated.');
+      
+                // Redirect after short delay
+                setTimeout(() => {
+                  window.location.href = '/user.html';
+                }, 3000);
+              } else {
+                document.getElementById('loadingMessage').style.display = 'none';
+                showMessage(data.message || 'Verification failed', true);
+              }
+            } catch (error) {
+              console.error('Verify error:', error);
+              document.getElementById('loadingMessage').style.display = 'none';
+              showMessage('Failed to verify payment.', true);
+            }
+          } else {
+            showMessage('Missing payment reference or token', true);
+          }
+        }
+      
+        window.addEventListener('DOMContentLoaded', verifyDeposit);
+      </script>
+      
+  </body>
+  
+</html>

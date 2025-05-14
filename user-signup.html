@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign Up - Sweepstakes</title>
+  <link rel="stylesheet" href="user-signup.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+        <img src="images/pch.jpg" alt="Logo" class="logo">
+          <h1 class="Tlogo">PCH Sweepstakes</h1>
+         
+        </div>
+      </header>
+
+      <div class="signup-container"> 
+        <form class="signup-form" id="signupForm">
+          <h2>Create Your Account</h2>
+      
+          <input type="text" id="name" placeholder="Full Name" required>
+          <input type="email" id="email" placeholder="Email Address" required>
+          <input type="tel" id="phone" placeholder="Phone Number" required>
+          <input type="text" id="address" placeholder="Address" required>
+          <input type="password" id="password" placeholder="Password" required>
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+      
+          <button type="submit">Sign Up</button>
+      
+          <p class="login-link">Already have an account? <a href="login.html">Login here</a></p>
+        </form>
+      </div>
+      
+      <script>
+        const form = document.getElementById('signupForm');
+      
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+      
+          const name = document.getElementById('name').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const phone = document.getElementById('phone').value.trim();
+          const address = document.getElementById('address').value.trim();
+          const password = document.getElementById('password').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+      
+          if (password !== confirmPassword) {
+            alert('Passwords do not match');
+            return;
+          }
+      
+          try {
+            const res = await fetch('http://localhost:5000/api/auth/signup', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name, email, phone, address, password })
+            });
+      
+            const data = await res.json();
+      
+            if (res.ok) {
+              alert('Signup successful!');
+              window.location.href = 'login.html';
+            } else {
+              alert(data.message || 'Signup failed');
+            }
+      
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Something went wrong');
+          }
+        });
+      </script>
+      
+</body>
+</html>

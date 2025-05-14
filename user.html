@@ -11,6 +11,11 @@
   <!-- Header -->
   <header class="header"> 
     <div class="container header-container">
+      <div class="dashboard-card">
+        <div class="toggle-visibility" id="toggleEye" style="cursor: pointer;">👁️</div>
+        <div class="loading-text">Your wallet balance:</div>
+        <div class="wallet-balance" id="wallet-balance">••••••</div>
+      </div>
       <img src="images/pch.jpg" alt="Logo" class="logo">
   
       <!-- Greeting Message -->
@@ -20,10 +25,11 @@
       <nav class="nav">
         <ul class="nav-list">
           <li><a href="#">Home</a></li>
-          <li><a href="#">Sweepstakes</a></li>
+          <li id="sweepstakeBtn"><a href="sweepstaks.html">Sweepstakes</a></li>
           <li><a href="#">Winners</a></li>
           <li><a href="#">Points</a></li>
-          <li><a href="#">Logout</a></li>
+          <li><a href="/wallet.html">Wallet</a></li> 
+          <li id="logoutBtn"><a href="index.html">Logout</a></li>
         </ul>
       </nav>
   
@@ -47,20 +53,24 @@
   
 
   <!-- Hero Section -->
-<section class="hero">
-    <div class="hero-overlay">
-        <div class="hero-content">
-            <h1>Win Up to $100,000 Instantly!</h1>
-            <p>Enter our daily sweepstakes for a chance to change your life today.</p>
-            <a href="#" class="btn-enter">Enter Now</a>
-          
-            <!-- Countdown Timer -->
-            <div class="countdown">
-              <p>Next draw in: <span id="timer">Loading...</span></p>
-            </div>
-        </div>   
+  <section class="hero">  
+    <div class="hero-overlay" id="heroOverlay">
+      <div class="hero-content">
+        <!-- Dynamically updated title and subtitle -->
+        <h1 id="heroTitle">Loading...</h1>
+        <p id="heroSubtitle">Please wait</p>
+        <!-- Dynamically updated button -->
+        <a id="heroCta" href="#" class="btn-enter">Loading...</a>
+  
+        <!-- Countdown Timer -->
+        <div class="countdown">
+          <p>Next draw in: <span id="timer">Loading...</span></p>
+        </div>
+      </div>   
     </div>
-</section>
+  </section>
+  
+  
 
 <section class="how-it-works" id="how-it-works">
     <div class="container">
@@ -177,39 +187,85 @@
   </footer>
   
   
+  
 
   <script>
-    // Set the countdown to midnight every day
-    function getNextMidnight() {
-      const now = new Date();
-      const nextMidnight = new Date();
-      nextMidnight.setHours(24, 0, 0, 0); // next midnight
-      return nextMidnight.getTime();
+
+    
+    
+   // Function to fetch the latest post from the backend
+   async function fetchgetActivePost() {
+    console.log('Fetching active post...');
+  try {
+    const response = await fetch('http://localhost:5000/api/posts/active?_=' + new Date().getTime());
+    console.log('Post fetch request sent...');
+    if (!response.ok) {
+      throw new Error('Failed to fetch latest post');
     }
-  
-    function startCountdown() {
-      const countdownDate = getNextMidnight();
-  
-      const timerElement = document.getElementById("timer");
-  
-      const x = setInterval(function () {
-        const now = new Date().getTime();
-        const distance = countdownDate - now;
-  
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-  
-        timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
-  
-        if (distance < 0) {
-          clearInterval(x);
-          timerElement.innerHTML = "00h 00m 00s";
-        }
-      }, 1000);
+
+    const data = await response.json();
+    console.log(data);
+    if (!data || !data.post) {
+      throw new Error('No post data found');
     }
-  
-    startCountdown();
+
+    const post = data.post;
+    console.log('Latest post fetched:', post);
+
+    document.getElementById('heroTitle').innerText = post.title || "Loading...";
+    document.getElementById('heroSubtitle').innerText = post.subtitle || "Please wait";
+
+    const heroCta = document.getElementById('heroCta');
+    heroCta.innerText = post.ctaText || "Loading...";
+    heroCta.href = post.ctaLink || "#";
+
+    const drawTime = new Date(post.drawTime);
+    startCountdown(drawTime);
+
+    const heroOverlay = document.getElementById('heroOverlay');
+    if (post.imageUrl) {
+      let imageUrl = post.imageUrl.replace(/\\/g, '/'); // Fix backslashes
+      if (!imageUrl.startsWith('http')) {
+        imageUrl = `http://localhost:5000/${imageUrl}`; // Prepend domain
+      }
+      heroOverlay.style.backgroundImage = `url(${imageUrl})`; // USE CORRECTED URL
+      heroOverlay.style.backgroundSize = 'cover'; // Optional: make it cover nicely
+      heroOverlay.style.backgroundPosition = 'center'; // Optional: center image
+    } else {
+      console.error("No image URL found in the post data");
+    }
+
+  } catch (error) {
+    console.error('Error fetching latest post:', error);
+  }
+}
+
+function startCountdown(drawTime) {
+  const countdownDate = drawTime.getTime();
+  const timerElement = document.getElementById("timer");
+
+  const x = setInterval(function () {
+    const now = new Date().getTime();
+    const distance = countdownDate - now;
+
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+
+    if (distance < 0) {
+      clearInterval(x);
+      timerElement.innerHTML = "00h 00m 00s";
+    }
+  }, 1000);
+}
+
+// Fetch when page loads
+window.onload = function () {
+  fetchgetActivePost();
+};
+
 
 
     const testimonials = [
@@ -257,9 +313,6 @@
   setInterval(showTestimonial, 3600000);
 
 
-
-
-
   window.onload = function () {
     const userName = localStorage.getItem("userName") || "Guest";
 
@@ -275,7 +328,7 @@
       timeOfDay = "Good evening";
     }
 
-    const message = `${timeOfDay}, ${userName}! 👋 Welcome back to our sweepstakes site. 🎉`;
+    const message = `${timeOfDay}, ${userName}!  Welcome back to our sweepstakes site. `;
 
     const greetingBox = document.getElementById("greeting");
     greetingBox.textContent = message;
@@ -286,23 +339,96 @@
     }, 6000);
   };
 
-  </script>
+  document.getElementById('sweepstakeBtn').addEventListener('click', () => {
+  window.location.href = 'sweepstaks.html';
+});
+
+
+
+  document.getElementById('logoutBtn').addEventListener('click', function () {
+    // Clear localStorage/sessionStorage if you're using it
+    localStorage.removeItem('token'); // or sessionStorage.removeItem('token');
+
+    // Optional: Clear all stored data
+    // localStorage.clear();
+
+    // Redirect to login page
+    window.location.href = 'login.html';
+  });
+
+
+
+
+
+
+
+
+
+
+
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user'));
+
+if (!token || !user) {
+  window.location.href = '/login.html'; // Not logged in
+}
+
+if (window.location.pathname.includes('admin') && user.role !== 'admin') {
+  window.location.href = '/unauthorized.html'; // User trying to access admin area
+}
+  let visible = false; 
+    let actualBalance = localStorage.getItem("walletBalance") 
+    ? `₦${Number(localStorage.getItem("walletBalance")).toLocaleString()}`
+    : null;
+
+
+if (token) {
+  // Clear stale balance
+  localStorage.removeItem("walletBalance");
+
+  // Fetch new balance
+  fetch('http://localhost:5000/api/wallet/balance', {
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    const formattedBalance = `₦${Number(data.balance).toLocaleString()}`;
+    localStorage.setItem("walletBalance", data.balance);
+
+    // Update balance on page
+    const balanceEl = document.getElementById('wallet-balance');
+    if (balanceEl) {
+      balanceEl.innerText = formattedBalance;
+    }
+  })
+  .catch(err => {
+    console.error("Error fetching updated balance:", err);
+  });
+}
+
+
+  // 👁️ Toggle balance visibility
+  document.getElementById('toggleEye').addEventListener('click', () => {
+    visible = !visible;
+    const balanceEl = document.getElementById('wallet-balance');
+    balanceEl.innerText = visible ? actualBalance : '••••••';
+  });
+
+
+
+
+
+
+
+ 
+
+  </script>3
   
 
 
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-  (function(){
-  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-  s1.async=true;
-  s1.src='https://embed.tawk.to/6800095dea5f5e190c3496a6/1ip0295t6';
-  s1.charset='UTF-8';
-  s1.setAttribute('crossorigin','*');
-  s0.parentNode.insertBefore(s1,s0);
-  })();
-  </script>
-  <!--End of Tawk.to Script-->
+
 
 
 

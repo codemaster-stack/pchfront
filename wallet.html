@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wallet</title>
+  <style>
+       @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+    .wallet-form {
+      transition: all 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .wallet-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .balance-section {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .balance-section h2 {
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    #walletBalance {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    
+    .wallet-action-btn {
+      padding: 12px 25px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+    
+    .wallet-action-btn:hover {
+      background-color: #2980b9;
+    }
+    
+    .wallet-form {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    
+    .wallet-form h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+    
+    .wallet-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    .wallet-submit-btn {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+    
+    .wallet-submit-btn:hover {
+      background-color: #219653;
+    }
+    
+    .wallet-submit-btn:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    
+    .transactions {
+      margin-top: 30px;
+    }
+    
+    #transactionTable {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    #transactionTable th, #transactionTable td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    #transactionTable th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    
+    .status-success {
+      color: #27ae60;
+      font-weight: bold;
+    }
+    
+    .status-pending {
+      color: #f39c12;
+      font-weight: bold;
+    }
+    
+    .status-failed {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wallet-container">
+    <!-- Balance Display -->
+    <div class="balance-section">
+      <h2>Wallet Balance</h2>
+      <p id="walletBalance">₦0.00</p>
+    </div>
+  
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button id="depositBtn" class="wallet-action-btn">Deposit</button>
+      <button id="withdrawBtn" class="wallet-action-btn">Withdraw</button>
+      <button id="transferBtn" class="wallet-action-btn">Transfer</button>
+    </div>
+  
+    <!-- Deposit Form -->
+    <div id="depositForm" class="wallet-form" style="display:none;">
+      <h3>Deposit via KoraPay</h3>
+      <input type="number" id="depositAmount" placeholder="Amount (₦)" min="100" step="100">
+      <button id="confirmDeposit" class="wallet-submit-btn">Proceed to Payment</button>
+    </div>
+  
+    <!-- Transaction History -->
+    <div class="transactions">
+      <h3>Transaction History</h3>
+      <table id="transactionTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+
+ 
+  
+
+  <script>
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // DOM Elements
+      const depositBtn = document.getElementById('depositBtn');
+      const depositForm = document.getElementById('depositForm');
+      const confirmDeposit = document.getElementById('confirmDeposit');
+      const depositAmount = document.getElementById('depositAmount');
+    
+      // Show Deposit Form
+      depositBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+    
+        // Hide all forms first
+        document.querySelectorAll('.wallet-form').forEach(form => {
+          form.style.display = 'none';
+        });
+    
+        // Show deposit form
+        depositForm.style.display = 'block';
+        depositForm.style.animation = 'fadeIn 0.3s ease';
+        depositAmount.focus();
+      });
+    
+      // Confirm Deposit
+      const ngrokUrl = 'https://58ca-102-90-103-94.ngrok-free.app';
+      confirmDeposit.addEventListener('click', async () => {
+        const amount = parseInt(depositAmount.value);
+    
+        if (!amount || amount < 100) {
+          alert("Minimum deposit amount is ₦100.");
+          return;
+        }
+    
+        try {
+          console.log("Initiating deposit for amount:", amount);
+          const token = localStorage.getItem('token');
+          const res = await fetch(`${ngrokUrl}/api/wallet/deposit`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+  amount,
+  redirect_url: "https://4d31-102-88-109-186.ngrok-free.app/payment-success.html"
+})
+
+          });
+    
+          const data = await res.json();
+          console.log("Server response:", data);
+    
+          if (!res.ok) {
+            throw new Error(data.message || 'Failed to initiate deposit');
+          }
+    
+          //  Redirect to Korapay checkout
+          window.location.href = data.checkoutUrl;
+    
+        } catch (error) {
+          console.error('Deposit error:', error);
+          alert(error.message || 'Something went wrong during deposit.');
+        }
+      });
+    });
+    </script>
+    
+    
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

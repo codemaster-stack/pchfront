@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="adminDashboard.css" />
+</head>
+<body>
+
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>Admin</h2>
+      <ul>
+        <li><a href="#" id="dashboardLink">Dashboard</a></li>
+        <li><a href="#" id="manageUsersLink">Manage Users</a></li>
+        <li><a href="#" id="addPostLink">Add Post</a></li>
+        <li><a href="#" id="testimonialsLink">Testimonials</a></li>
+        <li><a href="#" id="winnersLink">Winners</a></li>
+        <li><a href="#" id="addSweepstakeLink">Add Sweepstakes</a></li>
+        <li><a href="#" id="getLatestPosts">Get latest-post</a></li>
+
+        <li id="logoutBtn"><a href="index.html">Logout</a></li>
+      </ul>
+    </aside>
+
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 id="welcomeMessage">Welcome, Admin!</h1>
+        <p id="welcomeText">Select an option from the sidebar to get started.</p>
+      
+        <!-- Add Sweepstakes Section -->
+<section id="addSweepstakeSection" style="display: none;">
+  <h2>Add New Sweepstakes</h2>
+  <form class="post-form" enctype="multipart/form-data" id="addSweepstakeForm">
+    <div class="form-group">
+      <label for="sweepstakeTitle">Sweepstake Title:</label>
+      <input type="text" id="sweepstakeTitle" name="sweepstakeTitle" required />
+    </div>
+
+    <div class="form-group">
+      <label for="sweepstakeDescription">Description:</label>
+      <textarea id="sweepstakeDescription" name="sweepstakeDescription" rows="5" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="sweepstakeDeadline">Deadline:</label>
+      <input type="datetime-local" id="sweepstakeDeadline" name="sweepstakeDeadline" required />
+    </div>
+
+    <div class="form-group">
+      <label for="sweepstakeStakeCount">Required Stake Count:</label>
+      <input type="number" id="sweepstakeStakeCount" name="sweepstakeStakeCount" required />
+    </div>
+    
+
+    <div class="form-group">
+      <label for="sweepstakeImage">Upload Image:</label>
+      <input type="file" id="sweepstakeImage" name="sweepstakeImage" accept="image/*" required />
+    </div>
+
+    <button type="submit" class="btn">Create Sweepstakes</button>
+  </form>
+
+
+  <div class="post-preview" style="margin-top: 40px;">
+    <h2>Live Preview</h2>
+    <div id="sweepstakePreviewBox"></div>
+  </div>
+  
+</section>
+
+
+<!-- User Detail Modal --> 
+<div id="userModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h3>User Details</h3>
+    <p><strong>Name:</strong> <span id="modalName"></span></p>
+    <p><strong>Phone:</strong> <span id="modalPhone"></span></p>
+    <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+    <p><strong>Account Number:</strong> <span id="modalAccount"></span></p>
+    <p><strong>Wallet Balance:</strong> <span id="modalBalance"></span></p>
+    <p><strong>Points:</strong> <span id="modalPoints"></span></p>
+  </div>
+</div>
+
+  
+
+
+        <!-- Manage Users Section -->
+        <section id="manageUsersSection" style="display: none;">
+          <h2>Manage Users</h2>
+        
+          <!-- Search Input -->
+          <div style="margin-bottom: 15px;">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by name or email"
+              style="padding: 8px; width: 300px;"
+            />
+            
+            <!-- Buttons: Search + Bulk Email -->
+            <button onclick="searchUsers()" style="margin-left: 5px;">Search</button>
+            <button onclick="sendBulkEmail()" class="bulk-email-btn">Send Bulk Email</button>
+
+          </div>
+        
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="selectAll" /></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="userList">
+              <!-- Users will be loaded here via JavaScript -->
+            </tbody>
+          </table>
+        </section>
+        
+          
+
+
+      
+        <!-- Add Post Section -->
+        <section id="addPostSection" style="display: none;">
+  <h2>Add New Post</h2>
+  <form class="post-form" enctype="multipart/form-data" id="addPostForm">
+    <div class="form-group">
+      <label for="title">Hero Title:</label>
+      <input type="text" id="title" name="title" required />
+    </div>
+
+    <div class="form-group">
+      <label for="subtitle">Hero Subtitle:</label>
+      <input type="text" id="subtitle" name="subtitle" required />
+    </div>
+
+    <div class="form-group">
+      <label for="ctaText">CTA Text:</label>
+      <input type="text" id="ctaText" name="ctaText" required />
+    </div>
+
+    <div class="form-group">
+      <label for="ctaLink">CTA Link:</label>
+      <input type="text" id="ctaLink" name="ctaLink" required />
+    </div>
+
+    <input type="number" id="expectedStakeCount" placeholder="Expected Stake Count" required />
+
+
+    <div class="form-group">
+      <label for="drawTime">Draw Time:</label>
+      <input type="datetime-local" id="drawTime" name="drawTime" required />
+    </div>
+
+    <div class="form-group">
+      <label for="image">Upload Image:</label>
+      <input type="file" id="image" name="image" accept="image/*" required />
+    </div>
+
+    <button type="submit" class="btn">Post</button>
+  </form>
+
+  <div class="post-preview" style="margin-top: 40px;">
+    <h2>Live Preview</h2>
+    <div id="previewBox"></div>
+  </div>
+</section>
+
+        <!-- Testimonials Section -->
+        <section id="testimonialsSection" style="display: none;">
+          <h2>Testimonials</h2>
+          <p>Here you can manage user testimonials...</p>
+        </section>
+      
+        <!-- Winners Section -->
+        <section id="winnersSection" style="display: none;">
+          <h2>Winners</h2>
+          <p>List of recent winners...</p>
+        </section>
+        
+
+<!-- Get Latest Post Section -->
+<section id="getLatestPostsSection" style="display: none;">
+  <h2>Latest Post</h2>
+  <div id="latestPostBox" style="margin-top: 20px;">
+    <!-- Content will be inserted here via JS -->
+  </div>
+</section>
+
+
+      </main>
+      
+  </div>
+
+  <div id="emailModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeEmailModal()">&times;</span>
+      <h2>Send Email</h2>
+      <form id="emailForm">
+        <input type="hidden" id="emailRecipients" />
+        <label for="emailSubject">Subject:</label>
+        <input type="text" id="emailSubject" required />
+        <label for="emailMessage">Message:</label>
+        <textarea id="emailMessage" rows="5" required></textarea>
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+
+  <script>
+
+
+// Protect pages by checking role
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user'));
+
+if (!token || !user) {
+  window.location.href = '/login.html'; // Not logged in
+}
+
+if (window.location.pathname.includes('admin') && user.role !== 'admin') {
+  window.location.href = '/unauthorized.html'; // User trying to access admin area
+}
+
+  
+    // Show the dashboard section by default
+    const sections = {
+      dashboard: ['welcomeMessage', 'welcomeText'],
+      manageUsers: ['manageUsersSection'],
+      addPost: ['addPostSection'],
+      addSweepstake: ['addSweepstakeSection'],
+      testimonials: ['testimonialsSection'],
+      winners: ['winnersSection'],
+      getLatestPosts: ['getLatestPostsSection']
+    };
+  
+    function showSection(keys) {
+      // Hide all
+      Object.values(sections).flat().forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+  
+      // Show selected
+      keys.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'block';
+      });
+    }
+  
+    // Event listeners
+    document.getElementById('dashboardLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(sections.dashboard);
+    });
+  
+    document.getElementById('manageUsersLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(sections.manageUsers);
+    });
+  
+    document.getElementById('addPostLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(sections.addPost);
+    });
+
+    document.getElementById('addSweepstakeLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  showSection(sections.addSweepstake);
+});
+  
+    document.getElementById('testimonialsLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(sections.testimonials);
+    });
+  
+    document.getElementById('winnersLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection(sections.winners);
+    });
+
+    document.getElementById('getLatestPosts').addEventListener('click', (e) => {
+      e.preventDefault();
+      fetchLatestAdminPost();
+    });
+
+
+
+  
+    // Add preview logic (already explained earlier)
+    const form = document.querySelector(".post-form");
+    const previewBox = document.getElementById("previewBox");
+  
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+  
+      const title = document.getElementById("title").value;
+      const content = document.getElementById("content").value;
+      const image = document.getElementById("image").files[0];
+  
+      if (image) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          previewBox.innerHTML = `
+            <h3>${title}</h3>
+            <img src="${reader.result}" alt="Post Image" style="max-width: 100%; border-radius: 8px;" />
+            <p>${content}</p>
+          `;
+        };
+        reader.readAsDataURL(image);
+      }
+    });
+
+
+
+
+
+
+
+
+    let users = []; 
+   async function fetchUsers() {
+  try {
+    const response = await fetch('http://localhost:5000/api/admin/users', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    if (response.ok) {
+      users = await response.json(); // Store in global variable
+      renderUsers(users);
+    } else {
+      console.error('Failed to fetch users:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error fetching users:', error);
+  }
+}
+
+// Modify renderUsers to accept the fetched users from the API
+function renderUsers(users) {
+  const userList = document.getElementById("userList");
+  userList.innerHTML = "";
+
+  users.forEach((user, index) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td><input type="checkbox" class="user-checkbox" data-email="${user.email}"></td>
+      <td>${user.fullName}</td>
+      <td>${user.email}</td>
+      <td>
+         <button class="view-btn" onclick="viewUser(${index})">View</button>
+         <button class="delete-btn" onclick="deleteUser(${index})">Delete</button>
+         <button class="mail-btn" onclick="sendSingleEmail('${user.email}')">Mail</button>
+      </td>
+    `;
+
+    userList.appendChild(row);
+  });
+}
+
+
+// Modify the showSection to ensure users are loaded when "Manage Users" is clicked
+document.getElementById('manageUsersLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  showSection(sections.manageUsers); // Show the manage users section
+  fetchUsers(); // Fetch users from the backend
+});
+
+
+
+
+
+
+function deleteUser(index) {
+  const user = users[index]; // use global users
+  fetch(`http://localhost:5000/api/admin/delete-user/${user._id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success || data.message === "User deleted successfully") {
+      alert("User deleted successfully.");
+      fetchUsers(); // Reload users
+    } else {
+      alert("Failed to delete user");
+    }
+  })
+  .catch(err => console.log("Error deleting user: ", err));
+}
+
+
+
+
+
+
+
+
+document.getElementById('addPostForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append("title", document.getElementById("title").value);
+  formData.append("subtitle", document.getElementById("subtitle").value);
+  formData.append("ctaText", document.getElementById("ctaText").value);
+  formData.append("ctaLink", document.getElementById("ctaLink").value);
+  formData.append("image", document.getElementById("image").files[0]);
+
+  fetch('/api/admin/posts', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    },
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert("Post added successfully!");
+      // Optionally, update the UI or clear the form
+    }
+  })
+  .catch(err => console.log("Error adding post: ", err));
+});
+
+
+
+
+
+document.getElementById('addSweepstakeForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append("sweepstakeTitle", document.getElementById("sweepstakeTitle").value);
+  formData.append("sweepstakeDescription", document.getElementById("sweepstakeDescription").value);
+  formData.append("sweepstakeDeadline", document.getElementById("sweepstakeDeadline").value);
+  formData.append("sweepstakeStakeCount", document.getElementById("sweepstakeStakeCount").value);
+  formData.append("sweepstakeImage", document.getElementById("sweepstakeImage").files[0]);
+
+  fetch('/api/admin/sweepstakes', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    },
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert("Sweepstake added successfully!");
+    }
+  })
+  .catch(err => console.log("Error adding sweepstake: ", err));
+});
+
+
+
+
+
+function fetchLatestAdminPost() {
+  fetch('/api/admin/posts/latest', {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    const latestPostBox = document.getElementById('latestPostBox');
+    latestPostBox.innerHTML = `<h3>${data.title}</h3><p>${data.content}</p>`;
+  })
+  .catch(err => console.log("Error fetching latest posts: ", err));
+}
+
+
+
+
+
+
+
+
+
+
+  // Trigger user rendering on page load
+  document.addEventListener("DOMContentLoaded", renderUsers);
+
+
+  function viewUser(index) {
+  const user = users[index]; 
+
+  fetch(`http://localhost:5000/api/admin/users/${user._id}`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  .then(res => res.json())
+  .then(data =>{
+    document.getElementById("modalName").textContent = data.fullName ;
+    document.getElementById("modalEmail").textContent = data.email ;
+    document.getElementById("modalPhone").textContent = data.phone || 'N/A';
+    document.getElementById("modalPoints").textContent = data.points ?? 0;
+    document.getElementById("modalAccount").textContent = data.accountNumber || 'N/A';
+    document.getElementById("modalBalance").textContent = data.balance ?? 0;
+    document.getElementById("userModal").style.display = "block";
+  })
+  .catch(err => {
+    console.error("Error loading user details:", err);
+    alert("Failed to load user details.");
+  });
+}
+
+
+function closeModal() {
+  document.getElementById("userModal").style.display = "none";
+}
+
+
+function searchUsers() {
+  const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+
+  const filtered = users.filter(user =>
+    user.name.toLowerCase().includes(searchTerm) ||
+    user.email.toLowerCase().includes(searchTerm)
+  );
+
+  renderUsers(filtered);
+}
+
+
+function sendSingleEmail(email) {
+  openEmailModal([email]);
+}
+
+function sendBulkEmail() {
+  const selectedEmails = Array.from(document.querySelectorAll(".user-checkbox:checked"))
+    .map(checkbox => checkbox.dataset.email);
+
+  if (selectedEmails.length === 0) {
+    alert("Select at least one user to email.");
+    return;
+  }
+
+  openEmailModal(selectedEmails);
+}
+
+function openEmailModal(emails) {
+  document.getElementById("emailRecipients").value = emails.join(",");
+  document.getElementById("emailSubject").value = "";
+  document.getElementById("emailMessage").value = "";
+  document.getElementById("emailModal").style.display = "block";
+}
+
+function closeEmailModal() {
+  document.getElementById("emailModal").style.display = "none";
+}
+
+document.getElementById("emailForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const recipients = document.getElementById("emailRecipients").value.split(",");
+  const subject = document.getElementById("emailSubject").value;
+  const message = document.getElementById("emailMessage").value;
+
+  // TODO: Send to backend API
+  fetch('/api/send-email', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('token')}`
+  },
+  body: JSON.stringify({ recipients, subject, message })
+})
+.then(res => res.json())
+.then(data => {
+  alert("Email sent successfully!");
+  closeEmailModal();
+})
+.catch(err => {
+  console.error(err);
+  alert("Error sending email.");
+});
+  
+  });
+
+
+document.getElementById("selectAll").addEventListener("change", function () {
+  const checkboxes = document.querySelectorAll(".user-checkbox");
+  checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function () {
+    // Clear localStorage/sessionStorage if you're using it
+    localStorage.removeItem('token'); // or sessionStorage.removeItem('token');
+
+    // Optional: Clear all stored data
+    // localStorage.clear();
+
+    // Redirect to login page
+    window.location.href = 'index.html';
+  });
+
+
+
+
+
+
+  // Add Post Form Submission
+
+  document.getElementById("addPostForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    // Collect values
+const title = document.getElementById("title").value;
+const subtitle = document.getElementById("subtitle").value;
+const ctaText = document.getElementById("ctaText").value;
+const ctaLink = document.getElementById("ctaLink").value;
+const drawTime = document.getElementById("drawTime").value;
+const expectedStakeCount = document.getElementById("expectedStakeCount").value;
+const image = document.getElementById("image").files[0];
+
+const formData = new FormData();
+formData.append("title", title);
+formData.append("subtitle", subtitle);
+formData.append("ctaText", ctaText);
+formData.append("ctaLink", ctaLink);
+formData.append("drawTime", drawTime);
+formData.append("expectedStakeCount", expectedStakeCount);
+formData.append("image", image);
+
+
+    try {
+      const response = await fetch("http://localhost:5000/api/posts/create-post", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Post created successfully!");
+      } else {
+        alert(data.message || "Error creating post.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to create post.");
+    }
+  });
+
+
+
+
+
+  //  This is the new live preview logic (don't remove the above code)
+  const formInputs = ["title", "subtitle", "ctaText", "ctaLink", "drawTime", "image"];
+  formInputs.forEach(id => {
+    document.getElementById(id).addEventListener("input", updatePreview);
+  });
+  document.getElementById("image").addEventListener("change", updatePreview);
+
+  function updatePreview() {
+    const title = document.getElementById("title").value;
+    const subtitle = document.getElementById("subtitle").value;
+    const ctaText = document.getElementById("ctaText").value;
+    const ctaLink = document.getElementById("ctaLink").value;
+    const drawTime = document.getElementById("drawTime").value;
+    const image = document.getElementById("image").files[0];
+    const previewBox = document.getElementById("previewBox");
+
+    if (image) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        previewBox.innerHTML = `
+          <h3>${title}</h3>
+          <p><strong>${subtitle}</strong></p>
+          <a href="${ctaLink}" class="cta-button">${ctaText}</a>
+          <p><em>Draw Time: ${new Date(drawTime).toLocaleString()}</em></p>
+          <img src="${reader.result}" alt="Hero Image" style="max-width: 100%; border-radius: 8px;" />
+        `;
+      };
+      reader.readAsDataURL(image);
+    } else {
+      previewBox.innerHTML = `
+        <h3>${title}</h3>
+        <p><strong>${subtitle}</strong></p>
+        <a href="${ctaLink}" class="cta-button">${ctaText}</a>
+        <p><em>Draw Time: ${new Date(drawTime).toLocaleString()}</em></p>
+      `;
+    }
+  }
+
+
+
+
+
+      // Fetch Latest Admin Post
+ 
+  async function fetchLatestAdminPost() {
+  try {
+    console.log('Sending request to get the latest post...');
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found in localStorage');
+      return;
+    }
+
+    const response = await fetch('http://localhost:5000/api/posts/latest-post', {
+      method: 'GET', // Ensure the correct HTTP method is used
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Error response:', errorData);
+      throw new Error(errorData.message || 'Failed to fetch latest post');
+    }
+
+    const data = await response.json();
+    console.log('Latest post data:', data);
+
+
+    const imagePath = data.imageUrl.replace(/\\/g, "/"); // Fix backslashes
+
+const postContainer = document.getElementById("getLatestPostsSection"); 
+postContainer.innerHTML = `
+  <h3>${data.title}</h3>
+  <p><strong>${data.subtitle}</strong></p>
+  <a href="${data.ctaLink}" class="cta-button">${data.ctaText}</a>
+  <p><em>Draw Time: ${new Date(data.drawTime).toLocaleString()}</em></p>
+  <img src="http://localhost:5000/${imagePath}" style="max-width:100%; border-radius: 8px;" />
+`;
+
+showSection(sections.getLatestPosts); // Make sure to show the section after render
+
+
+    // Handle your post data here
+  } catch (error) {
+    console.error('Error fetching latest post:', error);
+  }
+}
+
+
+
+
+  </script>
+  
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6800095dea5f5e190c3496a6/1ip0295t6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    <!--End of Tawk.to Script-->
+ 
+</script>
+
+</body>
+</html>
