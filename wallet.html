@@ -220,7 +220,7 @@
       });
     
       // Confirm Deposit
-      const ngrokUrl = 'https://58ca-102-90-103-94.ngrok-free.app';
+      const backendUrl = 'https://pch-z6ny.onrender.com';
       confirmDeposit.addEventListener('click', async () => {
         const amount = parseInt(depositAmount.value);
     
@@ -232,7 +232,7 @@
         try {
           console.log("Initiating deposit for amount:", amount);
           const token = localStorage.getItem('token');
-          const res = await fetch(`${ngrokUrl}/api/wallet/deposit`, {
+          const res = await fetch(`${backendUrl}/api/wallet/deposit`,{
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -240,7 +240,7 @@
             },
             body: JSON.stringify({
   amount,
-  redirect_url: "https://4d31-102-88-109-186.ngrok-free.app/payment-success.html"
+  redirect_url: "https://pch-z6ny.onrender.com/payment-success.html"
 })
 
           });

@@ -197,7 +197,7 @@
    async function fetchgetActivePost() {
     console.log('Fetching active post...');
   try {
-    const response = await fetch('http://localhost:5000/api/posts/active?_=' + new Date().getTime());
+    const response = await fetch('https://pch-z6ny.onrender.com/api/posts/active?_=' + new Date().getTime());
     console.log('Post fetch request sent...');
     if (!response.ok) {
       throw new Error('Failed to fetch latest post');
@@ -226,7 +226,7 @@
     if (post.imageUrl) {
       let imageUrl = post.imageUrl.replace(/\\/g, '/'); // Fix backslashes
       if (!imageUrl.startsWith('http')) {
-        imageUrl = `http://localhost:5000/${imageUrl}`; // Prepend domain
+        imageUrl = `https://pch-z6ny.onrender.com/${imageUrl}`; // Prepend domain
       }
       heroOverlay.style.backgroundImage = `url(${imageUrl})`; // USE CORRECTED URL
       heroOverlay.style.backgroundSize = 'cover'; // Optional: make it cover nicely
@@ -387,7 +387,7 @@ if (token) {
   localStorage.removeItem("walletBalance");
 
   // Fetch new balance
-  fetch('http://localhost:5000/api/wallet/balance', {
+  fetch('https://pch-z6ny.onrender.com/api/wallet/balance', {
     headers: {
       'Authorization': 'Bearer ' + token
     }
