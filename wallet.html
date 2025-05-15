@@ -232,7 +232,7 @@
         try {
           console.log("Initiating deposit for amount:", amount);
           const token = localStorage.getItem('token');
-          const res = await fetch(`${backendUrl}/api/wallet/deposit`,{
+          const res = await fetch(`${backendUrl}/api/wallet/deposit/initiate`,{
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
