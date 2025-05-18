@@ -195,74 +195,123 @@
  
   
 
-  <script>
-    
-    document.addEventListener('DOMContentLoaded', () => {
-      // DOM Elements
-      const depositBtn = document.getElementById('depositBtn');
-      const depositForm = document.getElementById('depositForm');
-      const confirmDeposit = document.getElementById('confirmDeposit');
-      const depositAmount = document.getElementById('depositAmount');
-    
-      // Show Deposit Form
-      depositBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-    
-        // Hide all forms first
+ <script>
+  (function() {
+    // --- Configuration ---
+    const CONFIG = {
+      BACKEND_URL: 'https://pch-z6ny.onrender.com',
+      MIN_DEPOSIT: 100, // ₦100 minimum
+      TOKEN_KEY: 'auth_token',
+      SUCCESS_URL: `${window.location.origin}/payment-success.html` // Dynamic URL
+    };
+
+    // --- DOM Elements ---
+    const elements = {
+      depositBtn: document.getElementById('depositBtn'),
+      depositForm: document.getElementById('depositForm'),
+      confirmDeposit: document.getElementById('confirmDeposit'),
+      depositAmount: document.getElementById('depositAmount'),
+      loadingIndicator: document.getElementById('loadingIndicator'),
+      errorDisplay: document.getElementById('errorDisplay')
+    };
+
+    // --- UI Utilities ---
+    const ui = {
+      showForm: (formElement) => {
         document.querySelectorAll('.wallet-form').forEach(form => {
           form.style.display = 'none';
         });
-    
-        // Show deposit form
-        depositForm.style.display = 'block';
-        depositForm.style.animation = 'fadeIn 0.3s ease';
-        depositAmount.focus();
-      });
-    
-      // Confirm Deposit
-      const backendUrl = 'https://pch-z6ny.onrender.com';
-      confirmDeposit.addEventListener('click', async () => {
-        const amount = parseInt(depositAmount.value);
-    
-        if (!amount || amount < 100) {
-          alert("Minimum deposit amount is ₦100.");
-          return;
+        formElement.style.display = 'block';
+        formElement.style.animation = 'fadeIn 0.3s ease';
+      },
+      showError: (message) => {
+        if (elements.errorDisplay) {
+          elements.errorDisplay.textContent = message;
+          elements.errorDisplay.style.display = 'block';
+          setTimeout(() => {
+            elements.errorDisplay.style.display = 'none';
+          }, 5000);
         }
-    
-        try {
-          console.log("Initiating deposit for amount:", amount);
-          const token = localStorage.getItem('token');
-          const res = await fetch(`${backendUrl}/api/wallet/deposit/initiate`,{
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-  amount,
-  redirect_url: "https://pch-z6ny.onrender.com/payment-success.html"
-})
+        console.error(message);
+      },
+      setLoading: (isLoading) => {
+        if (elements.loadingIndicator) {
+          elements.loadingIndicator.style.display = isLoading ? 'block' : 'none';
+        }
+        elements.confirmDeposit.disabled = isLoading;
+      }
+    };
 
-          });
-    
-          const data = await res.json();
-          console.log("Server response:", data);
-    
-          if (!res.ok) {
-            throw new Error(data.message || 'Failed to initiate deposit');
-          }
-    
-          //  Redirect to Korapay checkout
-          window.location.href = data.checkoutUrl;
-    
-        } catch (error) {
-          console.error('Deposit error:', error);
-          alert(error.message || 'Something went wrong during deposit.');
+    // --- API Functions ---
+    const api = {
+      initiateDeposit: async (amount) => {
+        const token = localStorage.getItem(CONFIG.TOKEN_KEY);
+        if (!token) throw new Error('Authentication required');
+
+        const response = await fetch(`${CONFIG.BACKEND_URL}/api/wallet/deposit/initiate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            amount,
+            redirect_url: CONFIG.SUCCESS_URL
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Deposit initiation failed');
         }
+
+        return await response.json();
+      }
+    };
+
+    // --- Event Handlers ---
+    const handleDepositClick = (e) => {
+      e.preventDefault();
+      ui.showForm(elements.depositForm);
+      elements.depositAmount.focus();
+    };
+
+    const handleConfirmDeposit = async () => {
+      try {
+        // Validate input
+        const amount = parseInt(elements.depositAmount.value);
+        if (!amount || amount < CONFIG.MIN_DEPOSIT) {
+          throw new Error(`Minimum deposit amount is ₦${CONFIG.MIN_DEPOSIT}`);
+        }
+
+        ui.setLoading(true);
+        console.log('Initiating deposit for ₦', amount);
+
+        // Call API
+        const { checkoutUrl } = await api.initiateDeposit(amount);
+        
+        // Redirect to payment gateway
+        window.location.href = checkoutUrl;
+
+      } catch (error) {
+        ui.showError(error.message);
+        ui.setLoading(false);
+      }
+    };
+
+    // --- Initialize ---
+    document.addEventListener('DOMContentLoaded', () => {
+      // Event Listeners
+      elements.depositBtn?.addEventListener('click', handleDepositClick);
+      elements.confirmDeposit?.addEventListener('click', handleConfirmDeposit);
+
+      // Auto-focus amount field when form appears
+      elements.depositForm?.addEventListener('animationend', () => {
+        elements.depositAmount?.focus();
       });
     });
-    </script>
-    
+  })();
+</script>
     
 </body>
 </html>

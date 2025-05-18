@@ -31,80 +31,109 @@
     <div class="success" id="successMessage" style="display:none;"> Deposit Successful!</div>
     <div class="info" id="infoText" style="display:none;">You will be redirected to your dashboard shortly...</div>
     <div class="loading" id="loadingMessage"> Verifying payment...</div>
+    <div class="error" id="errorDisplay" style="display:none;"></div>
   
-    <script> 
-        console.log('Script loaded');
-      
-        //  1. Extract token from URL and store in localStorage
-        const urlParams = new URLSearchParams(window.location.search);
-        const tokenFromURL = urlParams.get('token');
-        if (tokenFromURL) {
-          localStorage.setItem('token', tokenFromURL);
-          console.log('Token saved to localStorage from URL');
-        }
-      
-        async function showMessage(message, isError = false) {
-          alert((isError ? ' Error: ' : ' ') + message);
-        }
-      
-        async function verifyDeposit() {
-          console.log('Running verifyDeposit');
-      
-          const params = new URLSearchParams(window.location.search);
-          const reference = params.get('reference') || params.get('ref');
-          console.log('Reference from URL:', reference);
-      
-          const token = localStorage.getItem('token');
-          console.log('Token from localStorage:', token);
-      
-          if (reference && token) {
-            document.getElementById('loadingMessage').style.display = 'block';
-            document.getElementById('successMessage').style.display = 'none';
-            document.getElementById('infoText').style.display = 'none';
-      
-            try {
-              const backendUrl = 'https://pch-z6ny.onrender.com'; // Replace ngrokUrl
+    <script>
+  (function() {
+    // --- Config ---
+    const CONFIG = {
+      BACKEND_URL: 'https://pch-z6ny.onrender.com', // Replace with your actual backend
+      REDIRECT_DELAY_MS: 3000,
+      TOKEN_KEY: 'auth_token'
+    };
 
-const response = await fetch(`${backendUrl}/api/wallet/verify-payment`, {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({ reference }), // ← Use `reference`, not `ref`
-});
+    // --- DOM Elements ---
+    const elements = {
+      loading: document.getElementById('loadingMessage'),
+      success: document.getElementById('successMessage'),
+      infoText: document.getElementById('infoText'),
+      errorDisplay: document.getElementById('errorDisplay') // Add this element in your HTML
+    };
 
-      
-              const data = await response.json();
-              console.log('Verification Response:', data);
-      
-              if (response.ok && data.status === 'success') {
-                document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('successMessage').style.display = 'block';
-                document.getElementById('infoText').style.display = 'block';
-      
-                showMessage('Payment verified and wallet updated.');
-      
-                // Redirect after short delay
-                setTimeout(() => {
-                  window.location.href = '/user.html';
-                }, 3000);
-              } else {
-                document.getElementById('loadingMessage').style.display = 'none';
-                showMessage(data.message || 'Verification failed', true);
-              }
-            } catch (error) {
-              console.error('Verify error:', error);
-              document.getElementById('loadingMessage').style.display = 'none';
-              showMessage('Failed to verify payment.', true);
-            }
-          } else {
-            showMessage('Missing payment reference or token', true);
-          }
+    // --- Utils ---
+    const utils = {
+      getQueryParam: (key) => new URLSearchParams(window.location.search).get(key),
+      storeToken: (token) => {
+        if (token) {
+          localStorage.setItem(CONFIG.TOKEN_KEY, token);
+          console.debug('Token stored in localStorage');
         }
-      
-        window.addEventListener('DOMContentLoaded', verifyDeposit);
-      </script>
+      },
+      showFeedback: (message, isError = false) => {
+        if (isError && elements.errorDisplay) {
+          elements.errorDisplay.textContent = message;
+          elements.errorDisplay.style.display = 'block';
+        }
+        console[isError ? 'error' : 'log'](message);
+      },
+      hideAllUI: () => {
+        Object.values(elements).forEach(el => {
+          if (el) el.style.display = 'none';
+        });
+      }
+    };
+
+    // --- Core Verification ---
+    async function verifyDeposit() {
+      console.log('Starting payment verification');
+      utils.hideAllUI();
+      if (elements.loading) elements.loading.style.display = 'block';
+
+      try {
+        // 1. Get reference and token
+        const reference = utils.getQueryParam('reference') || utils.getQueryParam('ref');
+        const token = localStorage.getItem(CONFIG.TOKEN_KEY) || utils.getQueryParam('token');
+        
+        if (!reference || !token) {
+          throw new Error('Missing payment reference or authentication token');
+        }
+
+        // Store token from URL if present
+        utils.storeToken(utils.getQueryParam('token'));
+
+        // 2. Call backend verification
+        const response = await fetch(`${CONFIG.BACKEND_URL}/api/wallet/verify-payment`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ reference })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Verification failed');
+        }
+
+        // 3. Handle success
+        utils.showFeedback('Payment verified successfully!');
+        utils.hideAllUI();
+        if (elements.success) elements.success.style.display = 'block';
+        if (elements.infoText) elements.infoText.style.display = 'block';
+
+        // 4. Redirect user
+        setTimeout(() => {
+          window.location.href = '/user.html';
+        }, CONFIG.REDIRECT_DELAY_MS);
+
+      } catch (error) {
+        console.error('Verification error:', error);
+        utils.hideAllUI();
+        utils.showFeedback(error.message, true);
+        
+        // Optional: Retry logic
+        if (confirm('Verification failed. Retry?')) {
+          verifyDeposit();
+        }
+      }
+    }
+
+    // --- Initialize ---
+    document.addEventListener('DOMContentLoaded', verifyDeposit);
+  })();
+</script>
       
   </body>
   
