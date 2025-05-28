@@ -196,95 +196,57 @@
 
 
 <script>
-    const backendUrl = "https://pch-z6ny.onrender.com/api";
-const token = localStorage.getItem("token"); // Replace with your token method
-const headers = {
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${token}`,
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  const walletBalance = document.getElementById("walletBalance");
-  const transactionTable = document.querySelector("#transactionTable tbody");
-  const loadingIndicator = document.getElementById("loadingIndicator");
-  const errorDisplay = document.getElementById("errorDisplay");
-
-  const depositBtn = document.getElementById("depositBtn");
-  const depositForm = document.getElementById("depositForm");
-  const confirmDeposit = document.getElementById("confirmDeposit");
-
-  // Fetch Wallet Balance & Transactions
-  async function fetchWalletData() {
-    loadingIndicator.style.display = "block";
-    errorDisplay.style.display = "none";
-
-    try {
-      const res = await fetch(`${backendUrl}/wallet/balance`, { headers });
-      if (!res.ok) throw new Error("Unable to fetch wallet");
-
-      const data = await res.json();
-      walletBalance.textContent = `₦${Number(data.balance).toLocaleString()}`;
-
-      transactionTable.innerHTML = data.transactions
-        .reverse()
-        .map(
-          (tx) => `
-        <tr>
-          <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
-          <td>${tx.type}</td>
-          <td>₦${Number(tx.amount).toLocaleString()}</td>
-          <td>${tx.status}</td>
-        </tr>
-      `
-        )
-        .join("");
-    } catch (err) {
-      errorDisplay.textContent = err.message || "Something went wrong";
-      errorDisplay.style.display = "block";
-    } finally {
-      loadingIndicator.style.display = "none";
-    }
-  }
-
-  // Toggle Deposit Form
-  depositBtn.addEventListener("click", () => {
-    depositForm.style.display =
-      depositForm.style.display === "none" ? "block" : "none";
+  document.getElementById('depositBtn').addEventListener('click', () => {
+    document.getElementById('depositForm').style.display = 'block';
   });
 
-  // Deposit Handler
-  confirmDeposit.addEventListener("click", async () => {
-    const amount = Number(document.getElementById("depositAmount").value);
-if (!amount || amount < 100) {
-  alert("Minimum deposit is ₦100");
-  return;
-}
+  document.getElementById('confirmDeposit').addEventListener('click', async () => {
+    const amountInput = document.getElementById('depositAmount');
+    const amount = parseFloat(amountInput.value);
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const errorDisplay = document.getElementById('errorDisplay');
 
+    // Hide any previous errors
+    errorDisplay.style.display = 'none';
+    errorDisplay.textContent = '';
+
+    // Validate input
+    if (!amount || amount < 100) {
+      errorDisplay.style.display = 'block';
+      errorDisplay.textContent = 'Please enter a valid amount (₦100 or more).';
+      return;
+    }
 
     try {
-      loadingIndicator.style.display = "block";
-      const res = await fetch(`${backendUrl}/wallet/deposit/initiate`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ amount }),
+      loadingIndicator.style.display = 'block';
+
+      const response = await fetch('/api/wallet/deposit/initiate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ amount })
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to initiate deposit");
+      const result = await response.json();
+      loadingIndicator.style.display = 'none';
 
-      window.location.href = data.paymentUrl; // KoraPay redirect
+      if (result.success && result.authorizationUrl) {
+        window.location.href = result.authorizationUrl; // ✅ Redirect to Korapay
+      } else {
+        errorDisplay.style.display = 'block';
+        errorDisplay.textContent = result.error || 'Something went wrong. Try again.';
+      }
     } catch (err) {
-      alert(err.message || "Something went wrong");
-    } finally {
-      loadingIndicator.style.display = "none";
+      loadingIndicator.style.display = 'none';
+      errorDisplay.style.display = 'block';
+      errorDisplay.textContent = 'Network error. Please try again.';
+      console.error('Deposit Error:', err);
     }
   });
+</script>
 
-  // Init fetch
-  fetchWalletData();
-});
-
-  </script>
  
   
 <!-- 
