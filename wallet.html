@@ -156,7 +156,11 @@
       <h2>Wallet Balance</h2>
       <p id="walletBalance">₦0.00</p>
     </div>
-  
+  <div id="loadingIndicator" style="display:none; text-align:center; margin-bottom:10px;">
+  <span class="spinner"></span> Processing...
+</div>
+<div id="errorDisplay" style="color:red; text-align:center; margin-bottom:10px; display:none;"></div>
+
     <!-- Action Buttons -->
     <div class="action-buttons">
       <button id="depositBtn" class="wallet-action-btn">Deposit</button>
@@ -191,10 +195,98 @@
   </div>
 
 
+<script>
+    const backendUrl = "https://pch-z6ny.onrender.com/api";
+const token = localStorage.getItem("token"); // Replace with your token method
+const headers = {
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${token}`,
+};
 
+document.addEventListener("DOMContentLoaded", () => {
+  const walletBalance = document.getElementById("walletBalance");
+  const transactionTable = document.querySelector("#transactionTable tbody");
+  const loadingIndicator = document.getElementById("loadingIndicator");
+  const errorDisplay = document.getElementById("errorDisplay");
+
+  const depositBtn = document.getElementById("depositBtn");
+  const depositForm = document.getElementById("depositForm");
+  const confirmDeposit = document.getElementById("confirmDeposit");
+
+  // Fetch Wallet Balance & Transactions
+  async function fetchWalletData() {
+    loadingIndicator.style.display = "block";
+    errorDisplay.style.display = "none";
+
+    try {
+      const res = await fetch(`${backendUrl}/wallet`, { headers });
+      if (!res.ok) throw new Error("Unable to fetch wallet");
+
+      const data = await res.json();
+      walletBalance.textContent = `₦${Number(data.balance).toLocaleString()}`;
+
+      transactionTable.innerHTML = data.transactions
+        .reverse()
+        .map(
+          (tx) => `
+        <tr>
+          <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
+          <td>${tx.type}</td>
+          <td>₦${Number(tx.amount).toLocaleString()}</td>
+          <td>${tx.status}</td>
+        </tr>
+      `
+        )
+        .join("");
+    } catch (err) {
+      errorDisplay.textContent = err.message || "Something went wrong";
+      errorDisplay.style.display = "block";
+    } finally {
+      loadingIndicator.style.display = "none";
+    }
+  }
+
+  // Toggle Deposit Form
+  depositBtn.addEventListener("click", () => {
+    depositForm.style.display =
+      depositForm.style.display === "none" ? "block" : "none";
+  });
+
+  // Deposit Handler
+  confirmDeposit.addEventListener("click", async () => {
+    const amount = document.getElementById("depositAmount").value;
+    if (!amount || amount < 100) {
+      alert("Minimum deposit is ₦100");
+      return;
+    }
+
+    try {
+      loadingIndicator.style.display = "block";
+      const res = await fetch(`${backendUrl}/wallet/deposit`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ amount }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to initiate deposit");
+
+      window.location.href = data.paymentUrl; // KoraPay redirect
+    } catch (err) {
+      alert(err.message || "Something went wrong");
+    } finally {
+      loadingIndicator.style.display = "none";
+    }
+  });
+
+  // Init fetch
+  fetchWalletData();
+});
+
+  </script>
  
   
-
+<!-- 
  <script>
   (function() {
     // --- Configuration ---
@@ -214,6 +306,8 @@
       loadingIndicator: document.getElementById('loadingIndicator'),
       errorDisplay: document.getElementById('errorDisplay')
     };
+
+    
 
     // --- UI Utilities ---
     const ui = {
@@ -298,6 +392,17 @@ const handleDepositClick = (e) => {
   elements.depositAmount.focus();
 };
 
+clearErrors: () => {
+  if (elements.errorDisplay) {
+    elements.errorDisplay.textContent = '';
+    elements.errorDisplay.style.display = 'none';
+  }
+}
+hideForm: (formElement) => {
+  formElement.style.display = 'none';
+}
+
+
 const handleConfirmDeposit = async () => {
   try {
     // Enhanced validation
@@ -310,6 +415,8 @@ const handleConfirmDeposit = async () => {
     if (amount < CONFIG.MIN_DEPOSIT) {
       throw new Error(`Minimum deposit is ₦${CONFIG.MIN_DEPOSIT}`);
     }
+
+    MAX_DEPOSIT: 1000000 // or whatever max you want
 
     if (amount > CONFIG.MAX_DEPOSIT) {
       throw new Error(`Maximum deposit is ₦${CONFIG.MAX_DEPOSIT}`);
@@ -369,8 +476,30 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+async function fetchWalletBalance() {
+  try {
+    const token = localStorage.getItem(CONFIG.TOKEN_KEY);
+    if (!token) throw new Error('Not logged in');
+
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/wallet/balance`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Failed to fetch wallet balance');
+
+    const data = await res.json();
+    const balanceElement = document.getElementById('walletBalance');
+    if (balanceElement && data.balance != null) {
+      balanceElement.textContent = `₦${Number(data.balance).toLocaleString()}`;
+    }
+  } catch (err) {
+    console.error(err);
+    ui.showError('Could not load wallet balance');
+  }
+}
+
+
   })();
-</script>
+</script> -->
     
 </body>
 </html>
