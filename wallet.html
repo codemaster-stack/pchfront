@@ -266,8 +266,9 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to initiate deposit");
 
-        // ✅ Redirect to KoraPay
-        window.location.href = data.paymentUrl;
+        //  Redirect to KoraPay
+        window.location.href = data.authorizationUrl;
+
       } catch (err) {
         alert(err.message || "Something went wrong");
       } finally {
