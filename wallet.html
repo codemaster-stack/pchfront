@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     errorDisplay.style.display = "none";
 
     try {
-      const res = await fetch(`${backendUrl}/wallet`, { headers });
+      const res = await fetch(`${backendUrl}/wallet/balance`, { headers });
       if (!res.ok) throw new Error("Unable to fetch wallet");
 
       const data = await res.json();
