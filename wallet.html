@@ -254,11 +254,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Deposit Handler
   confirmDeposit.addEventListener("click", async () => {
-    const amount = document.getElementById("depositAmount").value;
-    if (!amount || amount < 100) {
-      alert("Minimum deposit is ₦100");
-      return;
-    }
+    const amount = Number(document.getElementById("depositAmount").value);
+if (!amount || amount < 100) {
+  alert("Minimum deposit is ₦100");
+  return;
+}
+
 
     try {
       loadingIndicator.style.display = "block";
