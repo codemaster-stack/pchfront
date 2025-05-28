@@ -262,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       loadingIndicator.style.display = "block";
-      const res = await fetch(`${backendUrl}/wallet/deposit`, {
+      const res = await fetch(`${backendUrl}/wallet/deposit/initiate`, {
         method: "POST",
         headers,
         body: JSON.stringify({ amount }),
