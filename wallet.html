@@ -267,7 +267,8 @@
         if (!res.ok) throw new Error(data.message || "Failed to initiate deposit");
 
         //  Redirect to KoraPay
-        window.location.href = data.authorizationUrl;
+       window.location.href = data.data.authorizationUrl;
+
 
       } catch (err) {
         alert(err.message || "Something went wrong");
