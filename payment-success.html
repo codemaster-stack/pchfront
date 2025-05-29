@@ -92,14 +92,13 @@
         utils.storeToken(utils.getQueryParam('token'));
 
         // 2. Call backend verification
-        const response = await fetch(`${CONFIG.BACKEND_URL}/api/wallet/verify-payment`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ reference })
-        });
+        const response = await fetch(`${CONFIG.BACKEND_URL}/api/wallet/verify-payment?reference=${reference}`, {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${token}`
+  }
+});
+
 
         const data = await response.json();
         
