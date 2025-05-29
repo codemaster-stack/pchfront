@@ -183,6 +183,15 @@
       <input type="number" id="depositAmount" placeholder="Amount (₦)" min="100" step="100">
       <button id="confirmDeposit" class="wallet-submit-btn">Proceed to Payment</button>
     </div>
+
+     <!-- Transfer Form -->
+<div id="transferForm" class="wallet-form" style="display:none;">
+  <h3>Wallet to Wallet Transfer</h3>
+  <input type="text" id="recipientAccount" placeholder="Recipient Account Number">
+  <input type="number" id="transferAmount" placeholder="Amount (₦)" min="100" step="100">
+  <button id="confirmTransfer" class="wallet-submit-btn">Transfer Now</button>
+</div>
+
   
     <!-- Transaction History -->
     <div class="transactions">
@@ -224,11 +233,24 @@
     const depositForm = document.getElementById("depositForm");
     const confirmDeposit = document.getElementById("confirmDeposit");
 
+    const transferBtn = document.getElementById("transferBtn");
+    const transferForm = document.getElementById("transferForm");
+    const confirmTransfer = document.getElementById("confirmTransfer");
 
+    // Go Back Button
     document.getElementById("backArrow").addEventListener("click", () => {
-  window.location.href = "user.html"; // Go to the previous page
-});
+      window.location.href = "user.html";
+    });
 
+    // Toggle Deposit Form
+    depositBtn.addEventListener("click", () => {
+      depositForm.style.display = depositForm.style.display === "none" ? "block" : "none";
+    });
+
+    // Toggle Transfer Form
+    transferBtn.addEventListener("click", () => {
+      transferForm.style.display = transferForm.style.display === "none" ? "block" : "none";
+    });
 
     // Fetch Wallet Balance
     async function fetchWalletBalance() {
@@ -250,45 +272,39 @@
     }
 
     // Fetch Wallet Transactions
-    // Fetch Wallet Transactions
-async function fetchWalletTransactions() {
-  try {
-    const res = await fetch(`${backendUrl}/wallet/transactions`, { headers });
-    if (!res.ok) throw new Error("Unable to fetch transactions");
+    async function fetchWalletTransactions() {
+      try {
+        const res = await fetch(`${backendUrl}/wallet/transactions`, { headers });
+        if (!res.ok) throw new Error("Unable to fetch transactions");
 
-    const data = await res.json();
-    const transactions = data.transactions;
+        const data = await res.json();
+        const transactions = data.transactions;
 
-    if (!transactions || transactions.length === 0) {
-      transactionTable.innerHTML = `
-        <tr><td colspan="5" style="text-align:center;">No transactions yet</td></tr>
-      `;
-    } else {
-      transactionTable.innerHTML = transactions
-        .reverse()
-        .slice(0, 5) // 👈 LIMIT to most recent 5
-        .map((tx) => `
-          <tr>
-            <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
-            <td>${tx.type}</td>
-            <td>₦${Number(tx.amount).toLocaleString()}</td>
-            <td>${tx.status}</td>
-            <td>${tx.generatedReference || tx.paymentReference || "N/A"}</td>
-          </tr>
-        `).join("");
+        if (!transactions || transactions.length === 0) {
+          transactionTable.innerHTML = `
+            <tr><td colspan="5" style="text-align:center;">No transactions yet</td></tr>
+          `;
+        } else {
+          transactionTable.innerHTML = transactions
+            .reverse()
+            .slice(0, 5)
+            .map((tx) => `
+              <tr>
+                <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
+                <td>${tx.type}</td>
+                <td>₦${Number(tx.amount).toLocaleString()}</td>
+                <td>${tx.status}</td>
+                <td>${tx.generatedReference || tx.paymentReference || "N/A"}</td>
+              </tr>
+            `).join("");
+        }
+      } catch (err) {
+        console.error("Transaction error:", err);
+        transactionTable.innerHTML = `
+          <tr><td colspan="5" style="text-align:center;">Failed to load transactions</td></tr>
+        `;
+      }
     }
-  } catch (err) {
-    console.error("Transaction error:", err);
-    transactionTable.innerHTML = `
-      <tr><td colspan="5" style="text-align:center;">Failed to load transactions</td></tr>
-    `;
-  }
-}
-
-    // Toggle Deposit Form
-    depositBtn.addEventListener("click", () => {
-      depositForm.style.display = depositForm.style.display === "none" ? "block" : "none";
-    });
 
     // Handle Deposit
     confirmDeposit.addEventListener("click", async () => {
@@ -309,8 +325,43 @@ async function fetchWalletTransactions() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to initiate deposit");
 
-        // Redirect to KoraPay
         window.location.href = data.data.authorizationUrl;
+      } catch (err) {
+        alert(err.message || "Something went wrong");
+      } finally {
+        loadingIndicator.style.display = "none";
+      }
+    });
+
+    // Handle Wallet-to-Wallet Transfer
+    confirmTransfer.addEventListener("click", async () => {
+      const recipient = document.getElementById("recipientAccount").value.trim();
+      const amount = Number(document.getElementById("transferAmount").value);
+
+      if (!recipient || recipient.length !== 10) {
+        alert("Enter a valid 10-digit account number.");
+        return;
+      }
+
+      if (!amount || amount < 100) {
+        alert("Minimum transfer is ₦100.");
+        return;
+      }
+
+      try {
+        loadingIndicator.style.display = "block";
+        const res = await fetch(`${backendUrl}/wallet/transfer`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ recipientAccount: recipient, amount }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Transfer failed");
+
+        alert("Transfer successful!");
+        fetchWalletBalance();
+        fetchWalletTransactions();
       } catch (err) {
         alert(err.message || "Something went wrong");
       } finally {
@@ -323,6 +374,7 @@ async function fetchWalletTransactions() {
     fetchWalletTransactions();
   });
 </script>
+
 
  
 
