@@ -185,6 +185,7 @@
             <th>Type</th>
             <th>Amount</th>
             <th>Status</th>
+            <th>Reference</th>
           </tr>
         </thead>
         <tbody>
@@ -234,35 +235,40 @@
     }
 
     // Fetch Wallet Transactions
-    async function fetchWalletTransactions() {
-      try {
-        const res = await fetch(`${backendUrl}/wallet/transactions`, { headers });
-        if (!res.ok) throw new Error("Unable to fetch transactions");
+    // Fetch Wallet Transactions
+async function fetchWalletTransactions() {
+  try {
+    const res = await fetch(`${backendUrl}/wallet/transactions`, { headers });
+    if (!res.ok) throw new Error("Unable to fetch transactions");
 
-        const data = await res.json();
-        const transactions = data.transactions;
+    const data = await res.json();
+    const transactions = data.transactions;
 
-        if (!transactions || transactions.length === 0) {
-          transactionTable.innerHTML = `
-            <tr><td colspan="4" style="text-align:center;">No transactions yet</td></tr>
-          `;
-        } else {
-          transactionTable.innerHTML = transactions.reverse().map((tx) => `
-            <tr>
-              <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
-              <td>${tx.type}</td>
-              <td>₦${Number(tx.amount).toLocaleString()}</td>
-              <td>${tx.status}</td>
-            </tr>
-          `).join("");
-        }
-      } catch (err) {
-        console.error("Transaction error:", err);
-        transactionTable.innerHTML = `
-          <tr><td colspan="4" style="text-align:center;">Failed to load transactions</td></tr>
-        `;
-      }
+    if (!transactions || transactions.length === 0) {
+      transactionTable.innerHTML = `
+        <tr><td colspan="5" style="text-align:center;">No transactions yet</td></tr>
+      `;
+    } else {
+      transactionTable.innerHTML = transactions
+        .reverse()
+        .slice(0, 5) // 👈 LIMIT to most recent 5
+        .map((tx) => `
+          <tr>
+            <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
+            <td>${tx.type}</td>
+            <td>₦${Number(tx.amount).toLocaleString()}</td>
+            <td>${tx.status}</td>
+            <td>${tx.generatedReference || tx.paymentReference || "N/A"}</td>
+          </tr>
+        `).join("");
     }
+  } catch (err) {
+    console.error("Transaction error:", err);
+    transactionTable.innerHTML = `
+      <tr><td colspan="5" style="text-align:center;">Failed to load transactions</td></tr>
+    `;
+  }
+}
 
     // Toggle Deposit Form
     depositBtn.addEventListener("click", () => {
