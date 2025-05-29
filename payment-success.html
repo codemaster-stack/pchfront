@@ -82,14 +82,16 @@
       try {
         // 1. Get reference and token
         const reference = utils.getQueryParam('reference') || utils.getQueryParam('ref');
-        const token = localStorage.getItem(CONFIG.TOKEN_KEY) || utils.getQueryParam('token');
+        const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
         
-        if (!reference || !token) {
-          throw new Error('Missing payment reference or authentication token');
-        }
-
+       if (!reference) {
+  throw new Error('Missing payment reference. Please contact support.');
+}
+if (!token) {
+  throw new Error('Authentication token not found. Please login again.');
+}
         // Store token from URL if present
-        utils.storeToken(utils.getQueryParam('token'));
+        // utils.storeToken(utils.getQueryParam('token'));
 
         // 2. Call backend verification
         const response = await fetch(`${CONFIG.BACKEND_URL}/api/wallet/verify-payment?reference=${reference}`, {
