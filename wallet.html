@@ -226,14 +226,21 @@
         const data = await res.json();
         walletBalance.textContent = `₦${Number(data.balance).toLocaleString()}`;
 
-        transactionTable.innerHTML = data.transactions.reverse().map((tx) => `
-          <tr>
-            <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
-            <td>${tx.type}</td>
-            <td>₦${Number(tx.amount).toLocaleString()}</td>
-            <td>${tx.status}</td>
-          </tr>
-        `).join("");
+        if (data.transactions.length === 0) {
+  transactionTable.innerHTML = `
+    <tr><td colspan="4" style="text-align:center;">No transactions yet</td></tr>
+  `;
+} else {
+  transactionTable.innerHTML = data.transactions.reverse().map((tx) => `
+    <tr>
+      <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
+      <td>${tx.type}</td>
+      <td>₦${Number(tx.amount).toLocaleString()}</td>
+      <td>${tx.status}</td>
+    </tr>
+  `).join("");
+}
+
       } catch (err) {
         errorDisplay.textContent = err.message || "Something went wrong";
         errorDisplay.style.display = "block";
