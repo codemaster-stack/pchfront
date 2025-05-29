@@ -214,8 +214,8 @@
     const depositForm = document.getElementById("depositForm");
     const confirmDeposit = document.getElementById("confirmDeposit");
 
-    // Fetch Wallet Data
-    async function fetchWalletData() {
+    // Fetch Wallet Balance
+    async function fetchWalletBalance() {
       loadingIndicator.style.display = "block";
       errorDisplay.style.display = "none";
 
@@ -225,27 +225,42 @@
 
         const data = await res.json();
         walletBalance.textContent = `₦${Number(data.balance).toLocaleString()}`;
-
-        if (data.transactions.length === 0) {
-  transactionTable.innerHTML = `
-    <tr><td colspan="4" style="text-align:center;">No transactions yet</td></tr>
-  `;
-} else {
-  transactionTable.innerHTML = data.transactions.reverse().map((tx) => `
-    <tr>
-      <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
-      <td>${tx.type}</td>
-      <td>₦${Number(tx.amount).toLocaleString()}</td>
-      <td>${tx.status}</td>
-    </tr>
-  `).join("");
-}
-
       } catch (err) {
         errorDisplay.textContent = err.message || "Something went wrong";
         errorDisplay.style.display = "block";
       } finally {
         loadingIndicator.style.display = "none";
+      }
+    }
+
+    // Fetch Wallet Transactions
+    async function fetchWalletTransactions() {
+      try {
+        const res = await fetch(`${backendUrl}/wallet/transactions`, { headers });
+        if (!res.ok) throw new Error("Unable to fetch transactions");
+
+        const data = await res.json();
+        const transactions = data.transactions;
+
+        if (!transactions || transactions.length === 0) {
+          transactionTable.innerHTML = `
+            <tr><td colspan="4" style="text-align:center;">No transactions yet</td></tr>
+          `;
+        } else {
+          transactionTable.innerHTML = transactions.reverse().map((tx) => `
+            <tr>
+              <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
+              <td>${tx.type}</td>
+              <td>₦${Number(tx.amount).toLocaleString()}</td>
+              <td>${tx.status}</td>
+            </tr>
+          `).join("");
+        }
+      } catch (err) {
+        console.error("Transaction error:", err);
+        transactionTable.innerHTML = `
+          <tr><td colspan="4" style="text-align:center;">Failed to load transactions</td></tr>
+        `;
       }
     }
 
@@ -273,10 +288,8 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to initiate deposit");
 
-        //  Redirect to KoraPay
-       window.location.href = data.data.authorizationUrl;
-
-
+        // Redirect to KoraPay
+        window.location.href = data.data.authorizationUrl;
       } catch (err) {
         alert(err.message || "Something went wrong");
       } finally {
@@ -285,9 +298,12 @@
     });
 
     // Initial Load
-    fetchWalletData();
+    fetchWalletBalance();
+    fetchWalletTransactions();
   });
-</script> 
+</script>
+
+ 
 
     
 </body>
