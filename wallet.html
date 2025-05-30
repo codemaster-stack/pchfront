@@ -18,6 +18,11 @@
       animation: spin 1s ease-in-out infinite;
       margin-right: 8px;
     }
+
+     .transaction-row {
+    cursor: pointer;
+  }
+
     .wallet-form {
       transition: all 0.3s ease;
     }
@@ -291,68 +296,79 @@
 
     // Fetch Wallet Transactions
     async function fetchWalletTransactions() {
-      try {
-        const res = await fetch(`${backendUrl}/wallet/transactions`, { headers });
-        if (!res.ok) throw new Error("Unable to fetch transactions");
+  try {
+    const res = await fetch(`${backendUrl}/wallet/transactions`, { headers });
+    if (!res.ok) throw new Error("Unable to fetch transactions");
 
-        const data = await res.json();
-        const transactions = data.transactions;
+    const data = await res.json();
+    const transactions = data.transactions;
 
-        if (!transactions || transactions.length === 0) {
-          transactionTable.innerHTML = `
-            <tr><td colspan="5" style="text-align:center;">No transactions yet</td></tr>
-          `;
-        } else {
-          transactionTable.innerHTML = transactions
-            .slice(0, 5)
-            .map((tx) => `
-              <tr class="transaction-row" data-id="${tx._id}">
-                <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
-                <td>${tx.type}</td>
-                <td>₦${Number(tx.amount).toLocaleString()}</td>
-                <td>${tx.status}</td>
-                <td>${tx.generatedReference || tx.paymentReference || "N/A"}</td>
-              </tr>
-            `).join("");
-        }
-      } catch (err) {
-        console.error("Transaction error:", err);
-        transactionTable.innerHTML = `
-          <tr><td colspan="5" style="text-align:center;">Failed to load transactions</td></tr>
-        `;
-      }
+    if (!transactions || transactions.length === 0) {
+      transactionTable.innerHTML = `
+        <tr><td colspan="5" style="text-align:center;">No transactions yet</td></tr>
+      `;
+    } else {
+      transactionTable.innerHTML = transactions
+        .slice(0, 5)
+        .map((tx) => `
+          <tr class="transaction-row" data-id="${tx._id}">
+            <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
+            <td>${tx.type}</td>
+            <td>₦${Number(tx.amount).toLocaleString()}</td>
+            <td>${tx.status}</td>
+            <td>${tx.generatedReference || tx.paymentReference || "N/A"}</td>
+          </tr>
+        `).join("");
+
+      // Attach click listeners after rendering
+      document.querySelectorAll(".transaction-row").forEach(row => {
+        row.addEventListener("click", async () => {
+          const txId = row.getAttribute("data-id");
+
+          try {
+            const res = await fetch(`${backendUrl}/wallet/transactions/${txId}`, { headers });
+            if (!res.ok) throw new Error("Failed to fetch transaction details");
+
+            const { transaction } = await res.json();
+
+            const receiptHtml = `
+              <div style="padding:20px; font-family:Arial;">
+                <h2>Transaction Receipt</h2>
+                <p><strong>Date:</strong> ${new Date(transaction.createdAt).toLocaleString()}</p>
+                <p><strong>Type:</strong> ${transaction.type}</p>
+                <p><strong>Amount:</strong> ₦${Number(transaction.amount).toLocaleString()}</p>
+                <p><strong>Status:</strong> ${transaction.status}</p>
+                <p><strong>Reference:</strong> ${transaction.generatedReference || transaction.paymentReference}</p>
+                <p><strong>Payment Method:</strong> ${transaction.paymentMethod || "Wallet"}</p>
+              </div>
+              <div style="margin-top:20px; text-align:right;">
+                <button onclick="printReceipt()">Print</button>
+                <button onclick="sendReceipt()">Send to Recipient</button>
+                <button onclick="closeModal()">Close</button>
+              </div>
+            `;
+
+            function showModal(receiptHtml) {
+  document.getElementById("receiptContent").innerHTML = receiptHtml;
+  const modal = document.getElementById("receiptModal");
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+}
+
+          } catch (err) {
+            alert(err.message || "Failed to load receipt");
+          }
+        });
+      });
     }
-
-
-
-document.querySelectorAll('.transaction-row').forEach(row => {
-  row.addEventListener('click', async () => {
-    const txId = row.getAttribute('data-id');
-    if (!txId) return;
-
-    try {
-      const res = await fetch(`${backendUrl}/wallet/transaction/${txId}`, { headers });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to load transaction");
-
-      // 🧾 Show receipt in alert (replace with modal if you have one)
-      const receiptHtml = `
-  <p><strong>Type:</strong> ${data.transaction.type}</p>
-  <p><strong>Amount:</strong> ₦${data.transaction.amount.toLocaleString()}</p>
-  <p><strong>Status:</strong> ${data.transaction.status}</p>
-  <p><strong>Method:</strong> ${data.transaction.paymentMethod}</p>
-  <p><strong>Date:</strong> ${new Date(data.transaction.createdAt).toLocaleString()}</p>
-  <p><strong>Reference:</strong> ${data.transaction.generatedReference || data.transaction.paymentReference || 'N/A'}</p>
-`;
-
-showModal(receiptHtml);
-
-    } catch (err) {
-      alert(err.message || "Could not load receipt");
-    }
-  });
-});
-
+  } catch (err) {
+    console.error("Transaction error:", err);
+    transactionTable.innerHTML = `
+      <tr><td colspan="5" style="text-align:center;">Failed to load transactions</td></tr>
+    `;
+  }
+}
 
 
 
