@@ -295,7 +295,19 @@
     }
 
     // Fetch Wallet Transactions
-    async function fetchWalletTransactions() {
+   //  Global showModal function
+function showModal(receiptHtml) {
+  const modal = document.getElementById("receiptModal");
+  const content = document.getElementById("receiptContent");
+
+  content.innerHTML = receiptHtml;
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+}
+
+// Fetch Wallet Transactions
+async function fetchWalletTransactions() {
   try {
     const res = await fetch(`${backendUrl}/wallet/transactions`, { headers });
     if (!res.ok) throw new Error("Unable to fetch transactions");
@@ -348,13 +360,8 @@
               </div>
             `;
 
-            function showModal(receiptHtml) {
-  document.getElementById("receiptContent").innerHTML = receiptHtml;
-  const modal = document.getElementById("receiptModal");
-  modal.style.display = "flex";
-  modal.style.alignItems = "center";
-  modal.style.justifyContent = "center";
-}
+            //  Show the modal
+            showModal(receiptHtml);
 
           } catch (err) {
             alert(err.message || "Failed to load receipt");
@@ -369,7 +376,6 @@
     `;
   }
 }
-
 
 
     // Handle Deposit
@@ -481,38 +487,15 @@ transferBtn.addEventListener("click", async () => {
     fetchWalletBalance();
     fetchWalletTransactions();
   });
-</script>
+
 
 
  
 
-<script>
-  function showModal(receiptHtml) {
-    document.getElementById("receiptContent").innerHTML = receiptHtml;
-    document.getElementById("receiptModal").style.display = "flex";
-  }
 
-  function closeModal() {
-    document.getElementById("receiptModal").style.display = "none";
-  }
 
-  function printReceipt() {
-    const content = document.getElementById("receiptContent").innerHTML;
-    const printWindow = window.open('', '', 'width=800,height=600');
-    printWindow.document.write('<html><head><title>Print Receipt</title></head><body>');
-    printWindow.document.write(content);
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.print();
-  }
 
-  async function sendReceipt() {
-    alert("Sending receipt... (Feature under development)");
-    
-  }
 </script>
-
-
 
 
     
