@@ -189,6 +189,7 @@
   <h3>Wallet to Wallet Transfer</h3>
   <input type="text" id="recipientAccount" placeholder="Recipient Account Number">
   <input type="number" id="transferAmount" placeholder="Amount (₦)" min="100" step="100">
+  <input type="password" id="transferPin" placeholder="Transaction PIN" maxlength="4" required>
   <button id="confirmTransfer" class="wallet-submit-btn">Transfer Now</button>
 </div>
 
@@ -333,28 +334,67 @@
       }
     });
 
+
+
+    // Handle transger to wallet
+
+transferBtn.addEventListener("click", async () => {
+  try {
+    loadingIndicator.style.display = "block";
+    const res = await fetch(`${backendUrl}/wallet/chek-pin`, {
+      method: "GET",
+      headers,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message || "Failed to verify PIN");
+
+    if (data.hasPin) {
+      transferForm.style.display = "block";
+    } else {
+      if (confirm("Create transaction pin first")) {
+        window.location.href = "transactionPin.html";
+      }
+    }
+  } catch (err) {
+    alert(err.message || "Error verifying transaction PIN");
+  } finally {
+    loadingIndicator.style.display = "none";
+  }
+});
+
+
+
+
     // Handle Wallet-to-Wallet Transfer
     confirmTransfer.addEventListener("click", async () => {
       const recipient = document.getElementById("recipientAccount").value.trim();
       const amount = Number(document.getElementById("transferAmount").value);
-
-      if (!recipient || recipient.length !== 10) {
-        alert("Enter a valid 10-digit account number.");
-        return;
-      }
+      const pin = document.getElementById("transferPin").value.trim();
 
       if (!amount || amount < 100) {
-        alert("Minimum transfer is ₦100.");
-        return;
-      }
+    return alert("Minimum transfer is ₦100");
+  }
+  if (!recipientAccount || recipientAccount.length !== 10) {
+    return alert("Enter a valid 10-digit account number");
+  }
+  if (!transferPin || transferPin.length !== 4) {
+    return alert("Enter your 4-digit transaction PIN");
+  }
 
       try {
-        loadingIndicator.style.display = "block";
-        const res = await fetch(`${backendUrl}/wallet/transfer`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ recipientAccount: recipient, amount }),
-        });
+    loadingIndicator.style.display = "block";
+
+    const res = await fetch(`${backendUrl}/wallet/transfer`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        amount,
+        recipientAccount,
+        pin: transferPin,
+      }),
+    });
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Transfer failed");
