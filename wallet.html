@@ -222,15 +222,28 @@
 
 
 <!-- Receipt Modal -->
-<div id="receiptModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+<div id="receiptModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;"> 
   <div style="background:#fff; padding:20px; border-radius:10px; width:90%; max-width:500px; position:relative;">
     <h3>Payment Receipt</h3>
     <div id="receiptContent" style="margin-top:10px;"></div>
     <div style="margin-top:20px; text-align:right;">
-      <button onclick="printReceipt()">Print</button>
-      <button onclick="sendReceipt()">Send Receipt</button>
-      <button onclick="closeModal()">Close</button>
+      <button id="printBtn">Print</button>
+      <button id="sendBtn">Send Receipt</button>
+      <button id="closeBtn">Close</button>
     </div>
+  </div>
+</div>
+
+
+
+<!-- Send Method Modal -->
+<div id="sendMethodModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1100; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; border-radius:10px; width:90%; max-width:300px; text-align:center;">
+    <h3>Send Receipt Via</h3>
+    <button onclick="sendReceiptEmail()" style="margin:10px; padding:10px 20px;">Email</button>
+    <button onclick="sendReceiptWhatsApp()" style="margin:10px; padding:10px 20px;">WhatsApp</button>
+    <br/>
+    <button onclick="cancelSend()" style="margin-top:20px; padding:5px 10px; background:#ccc;">Cancel</button>
   </div>
 </div>
 
@@ -294,8 +307,8 @@
       }
     }
 
-    // Fetch Wallet Transactions
-   //  Global showModal function
+   // Global showModal function
+// Global showModal function
 function showModal(receiptHtml) {
   const modal = document.getElementById("receiptModal");
   const content = document.getElementById("receiptContent");
@@ -306,7 +319,55 @@ function showModal(receiptHtml) {
   modal.style.justifyContent = "center";
 }
 
-// Fetch Wallet Transactions
+// Close main receipt modal
+function closeModal() {
+  document.getElementById("receiptModal").style.display = "none";
+  // Also hide send method modal if open
+  document.getElementById("sendMethodModal").style.display = "none";
+}
+
+// Print receipt function
+function printReceipt() {
+  const content = document.getElementById("receiptContent").innerHTML;
+  const printWindow = window.open('', '', 'width=800,height=600');
+  printWindow.document.write('<html><head><title>Print Receipt</title></head><body>');
+  printWindow.document.write(content);
+  printWindow.document.write('</body></html>');
+  printWindow.document.close();
+  printWindow.print();
+}
+
+// Show Send Method modal (Email or WhatsApp options)
+function sendReceipt() {
+  // Show the send method modal
+  document.getElementById("sendMethodModal").style.display = "flex";
+  document.getElementById("sendMethodModal").style.alignItems = "center";
+  document.getElementById("sendMethodModal").style.justifyContent = "center";
+}
+
+// Send receipt via Email client
+function sendReceiptEmail() {
+  const receiptContent = document.getElementById("receiptContent").innerText || "";
+  const subject = "Your Payment Receipt";
+  const body = receiptContent;
+
+  const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailtoUrl;
+}
+
+// Send receipt via WhatsApp
+function sendReceiptWhatsApp() {
+  const receiptContent = document.getElementById("receiptContent").innerText || "";
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(receiptContent)}`;
+  window.open(whatsappUrl, "_blank");
+}
+
+// Cancel sending receipt and hide send method modal
+function cancelSend() {
+  document.getElementById("sendMethodModal").style.display = "none";
+}
+
+// Fetch Wallet Transactions (your existing code with minor tweaks for buttons)
 async function fetchWalletTransactions() {
   try {
     const res = await fetch(`${backendUrl}/wallet/transactions`, { headers });
@@ -354,14 +415,18 @@ async function fetchWalletTransactions() {
                 <p><strong>Payment Method:</strong> ${transaction.paymentMethod || "Wallet"}</p>
               </div>
               <div style="margin-top:20px; text-align:right;">
-                <button onclick="printReceipt()">Print</button>
-                <button onclick="sendReceipt()">Send to Recipient</button>
-                <button onclick="closeModal()">Close</button>
+                <button id="printBtn">Print</button>
+                <button id="sendBtn">Send to Recipient</button>
+                <button id="closeBtn">Close</button>
               </div>
             `;
 
-            //  Show the modal
             showModal(receiptHtml);
+
+            // Attach button event listeners
+            document.getElementById("printBtn").onclick = printReceipt;
+            document.getElementById("sendBtn").onclick = sendReceipt;
+            document.getElementById("closeBtn").onclick = closeModal;
 
           } catch (err) {
             alert(err.message || "Failed to load receipt");
