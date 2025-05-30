@@ -336,7 +336,7 @@
 
 
 
-    // Handle transger to wallet
+    // Handle transfer to wallet
 
 transferBtn.addEventListener("click", async () => {
   try {
@@ -369,22 +369,23 @@ transferBtn.addEventListener("click", async () => {
 
     // Handle Wallet-to-Wallet Transfer
     confirmTransfer.addEventListener("click", async () => {
-      const recipient = document.getElementById("recipientAccount").value.trim();
-      const amount = Number(document.getElementById("transferAmount").value);
-      const pin = document.getElementById("transferPin").value.trim();
+  const recipientAccount = document.getElementById("recipientAccount").value.trim();
+  const amount = Number(document.getElementById("transferAmount").value);
+  const transferPin = document.getElementById("transferPin").value.trim();
 
-      if (!amount || amount < 100) {
+  if (!amount || amount < 100) {
     return alert("Minimum transfer is ₦100");
   }
+
   if (!/^\d{10}$/.test(recipientAccount)) {
-  return alert("Enter a valid 10-digit account number");
-}
+    return alert("Enter a valid 10-digit account number");
+  }
 
   if (!transferPin || transferPin.length !== 4) {
     return alert("Enter your 4-digit transaction PIN");
   }
 
-      try {
+  try {
     loadingIndicator.style.display = "block";
 
     const res = await fetch(`${backendUrl}/wallet/transfer`, {
@@ -397,18 +398,19 @@ transferBtn.addEventListener("click", async () => {
       }),
     });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Transfer failed");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Transfer failed");
 
-        alert("Transfer successful!");
-        fetchWalletBalance();
-        fetchWalletTransactions();
-      } catch (err) {
-        alert(err.message || "Something went wrong");
-      } finally {
-        loadingIndicator.style.display = "none";
-      }
-    });
+    alert("Transfer successful!");
+    fetchWalletBalance();
+    fetchWalletTransactions();
+  } catch (err) {
+    alert(err.message || "Something went wrong");
+  } finally {
+    loadingIndicator.style.display = "none";
+  }
+});
+
 
     // Initial Load
     fetchWalletBalance();
