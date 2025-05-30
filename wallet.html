@@ -287,7 +287,6 @@
           `;
         } else {
           transactionTable.innerHTML = transactions
-            .reverse()
             .slice(0, 5)
             .map((tx) => `
               <tr>
@@ -298,6 +297,8 @@
                 <td>${tx.generatedReference || tx.paymentReference || "N/A"}</td>
               </tr>
             `).join("");
+            attachTransactionRowClickHandlers();
+
         }
       } catch (err) {
         console.error("Transaction error:", err);
@@ -306,6 +307,29 @@
         `;
       }
     }
+
+
+
+function attachTransactionRowClickHandlers() {
+  document.querySelectorAll(".transaction-row").forEach(row => {
+    row.addEventListener("click", async () => {
+      const transactionId = row.dataset.id;
+      try {
+        const res = await fetch(`${backendUrl}/wallet/transaction/${transactionId}`, { headers });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Transaction not found");
+
+        showTransactionModal(data.transaction); // we will define this next
+      } catch (err) {
+        alert("Error fetching receipt: " + err.message);
+      }
+    });
+  });
+}
+
+
+
+
 
     // Handle Deposit
     confirmDeposit.addEventListener("click", async () => {
