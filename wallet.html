@@ -326,7 +326,7 @@
           const txId = row.getAttribute("data-id");
 
           try {
-            const res = await fetch(`${backendUrl}/wallet/transactions/${txId}`, { headers });
+            const res = await fetch(`${backendUrl}/wallet/transaction/${txId}`, { headers });
             if (!res.ok) throw new Error("Failed to fetch transaction details");
 
             const { transaction } = await res.json();
