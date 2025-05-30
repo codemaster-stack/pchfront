@@ -215,6 +215,23 @@
   </div>
 
 
+
+<!-- Receipt Modal -->
+<div id="receiptModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; border-radius:10px; width:90%; max-width:500px; position:relative;">
+    <h3>Payment Receipt</h3>
+    <div id="receiptContent" style="margin-top:10px;"></div>
+    <div style="margin-top:20px; text-align:right;">
+      <button onclick="printReceipt()">Print</button>
+      <button onclick="sendReceipt()">Send Receipt</button>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+
+
+
 <script>
   const backendUrl = "https://pch-z6ny.onrender.com/api";
   const token = localStorage.getItem("token");
@@ -289,7 +306,7 @@
           transactionTable.innerHTML = transactions
             .slice(0, 5)
             .map((tx) => `
-              <tr>
+              <tr class="transaction-row" data-id="${tx._id}">
                 <td>${new Date(tx.createdAt).toLocaleDateString()}</td>
                 <td>${tx.type}</td>
                 <td>₦${Number(tx.amount).toLocaleString()}</td>
@@ -297,8 +314,6 @@
                 <td>${tx.generatedReference || tx.paymentReference || "N/A"}</td>
               </tr>
             `).join("");
-            attachTransactionRowClickHandlers();
-
         }
       } catch (err) {
         console.error("Transaction error:", err);
@@ -310,23 +325,33 @@
 
 
 
-function attachTransactionRowClickHandlers() {
-  document.querySelectorAll(".transaction-row").forEach(row => {
-    row.addEventListener("click", async () => {
-      const transactionId = row.dataset.id;
-      try {
-        const res = await fetch(`${backendUrl}/wallet/transaction/${transactionId}`, { headers });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Transaction not found");
+document.querySelectorAll('.transaction-row').forEach(row => {
+  row.addEventListener('click', async () => {
+    const txId = row.getAttribute('data-id');
+    if (!txId) return;
 
-        showTransactionModal(data.transaction); // we will define this next
-      } catch (err) {
-        alert("Error fetching receipt: " + err.message);
-      }
-    });
+    try {
+      const res = await fetch(`${backendUrl}/wallet/transaction/${txId}`, { headers });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to load transaction");
+
+      // 🧾 Show receipt in alert (replace with modal if you have one)
+      const receiptHtml = `
+  <p><strong>Type:</strong> ${data.transaction.type}</p>
+  <p><strong>Amount:</strong> ₦${data.transaction.amount.toLocaleString()}</p>
+  <p><strong>Status:</strong> ${data.transaction.status}</p>
+  <p><strong>Method:</strong> ${data.transaction.paymentMethod}</p>
+  <p><strong>Date:</strong> ${new Date(data.transaction.createdAt).toLocaleString()}</p>
+  <p><strong>Reference:</strong> ${data.transaction.generatedReference || data.transaction.paymentReference || 'N/A'}</p>
+`;
+
+showModal(receiptHtml);
+
+    } catch (err) {
+      alert(err.message || "Could not load receipt");
+    }
   });
-}
-
+});
 
 
 
@@ -444,6 +469,35 @@ transferBtn.addEventListener("click", async () => {
 
 
  
+
+<script>
+  function showModal(receiptHtml) {
+    document.getElementById("receiptContent").innerHTML = receiptHtml;
+    document.getElementById("receiptModal").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("receiptModal").style.display = "none";
+  }
+
+  function printReceipt() {
+    const content = document.getElementById("receiptContent").innerHTML;
+    const printWindow = window.open('', '', 'width=800,height=600');
+    printWindow.document.write('<html><head><title>Print Receipt</title></head><body>');
+    printWindow.document.write(content);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+  }
+
+  async function sendReceipt() {
+    alert("Sending receipt... (Feature under development)");
+    
+  }
+</script>
+
+
+
 
     
 </body>
