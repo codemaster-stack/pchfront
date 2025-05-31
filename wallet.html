@@ -414,14 +414,16 @@ async function fetchWalletTransactions() {
                 <p><strong>Reference:</strong> ${transaction.generatedReference || transaction.paymentReference}</p>
                 <p><strong>Payment Method:</strong> ${transaction.paymentMethod || "Wallet"}</p>
               </div>
-            `;
+              <div style="margin-top:20px; text-align:right;">
+                 <button id="printBtn">Print</button>
+                 <button id="sendBtn">Send to Recipient</button>
+                 <button id="closeBtn">Close</button>
+               </div
+               `;
 
             showModal(receiptHtml);
 
-            // Attach button event listeners
-            document.getElementById("printBtn").onclick = printReceipt;
-            document.getElementById("sendBtn").onclick = sendReceipt;
-            document.getElementById("closeBtn").onclick = closeModal;
+           
 
           } catch (err) {
             alert(err.message || "Failed to load receipt");
