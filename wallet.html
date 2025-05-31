@@ -307,8 +307,10 @@
       }
     }
 
-   // Global showModal function
-// Global showModal function
+
+
+
+   // Global showModal function 
 function showModal(receiptHtml) {
   const modal = document.getElementById("receiptModal");
   const content = document.getElementById("receiptContent");
@@ -322,7 +324,6 @@ function showModal(receiptHtml) {
 // Close main receipt modal
 function closeModal() {
   document.getElementById("receiptModal").style.display = "none";
-  // Also hide send method modal if open
   document.getElementById("sendMethodModal").style.display = "none";
 }
 
@@ -339,7 +340,6 @@ function printReceipt() {
 
 // Show Send Method modal (Email or WhatsApp options)
 function sendReceipt() {
-  // Show the send method modal
   document.getElementById("sendMethodModal").style.display = "flex";
   document.getElementById("sendMethodModal").style.alignItems = "center";
   document.getElementById("sendMethodModal").style.justifyContent = "center";
@@ -367,7 +367,7 @@ function cancelSend() {
   document.getElementById("sendMethodModal").style.display = "none";
 }
 
-// Fetch Wallet Transactions (your existing code with minor tweaks for buttons)
+// Fetch Wallet Transactions
 async function fetchWalletTransactions() {
   try {
     const res = await fetch(`${backendUrl}/wallet/transactions`, { headers });
@@ -393,7 +393,7 @@ async function fetchWalletTransactions() {
           </tr>
         `).join("");
 
-      // Attach click listeners after rendering
+      // Attach click listeners to each row
       document.querySelectorAll(".transaction-row").forEach(row => {
         row.addEventListener("click", async () => {
           const txId = row.getAttribute("data-id");
@@ -414,16 +414,9 @@ async function fetchWalletTransactions() {
                 <p><strong>Reference:</strong> ${transaction.generatedReference || transaction.paymentReference}</p>
                 <p><strong>Payment Method:</strong> ${transaction.paymentMethod || "Wallet"}</p>
               </div>
-              <div style="margin-top:20px; text-align:right;">
-                 <button id="printBtn">Print</button>
-                 <button id="sendBtn">Send to Recipient</button>
-                 <button id="closeBtn">Close</button>
-               </div
-               `;
+            `;
 
             showModal(receiptHtml);
-
-           
 
           } catch (err) {
             alert(err.message || "Failed to load receipt");
@@ -438,6 +431,15 @@ async function fetchWalletTransactions() {
     `;
   }
 }
+
+//  Attach global button listeners once after DOM loads
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("printBtn").onclick = printReceipt;
+  document.getElementById("sendBtn").onclick = sendReceipt;
+  document.getElementById("closeBtn").onclick = closeModal;
+});
+
+
 
 
     // Handle Deposit
