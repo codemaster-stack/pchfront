@@ -198,6 +198,40 @@
   <button id="confirmTransfer" class="wallet-submit-btn">Transfer Now</button>
 </div>
 
+
+
+<!-- Withdrawal Modal -->
+<div id="withdrawModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; border-radius:10px; width:90%; max-width:400px;">
+    <h3>Withdraw Funds</h3>
+    <form id="withdrawForm">
+      <label>Bank Name:</label>
+      <select id="bankName" required>
+        <option value="">Select Bank</option>
+        <option value="access-bank">Access Bank</option>
+        <option value="gtbank">GTBank</option>
+        <option value="first-bank">First Bank</option>
+        <!-- Add more banks as needed -->
+      </select>
+
+      <label>Account Number:</label>
+      <input type="text" id="accountNumber" maxlength="10" required />
+
+      <label>Amount (₦):</label>
+      <input type="number" id="withdrawAmount" required />
+
+      <label>Transaction PIN:</label>
+      <input type="password" id="withdrawPin" maxlength="4" required />
+
+      <button type="submit">Submit Withdrawal</button>
+    </form>
+    <button onclick="closeWithdrawModal()">Cancel</button>
+  </div>
+</div>
+
+
+
+
   
     <!-- Transaction History -->
     <div class="transactions">
@@ -448,6 +482,8 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
+
+
     // Handle Deposit
     confirmDeposit.addEventListener("click", async () => {
       const amount = Number(document.getElementById("depositAmount").value);
@@ -477,7 +513,75 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 
-    // Handle transfer to wallet
+
+// Handle Withdraw Button Click
+
+document.getElementById("withdrawBtn").addEventListener("click", async () => {
+  try {
+    const res = await fetch(`${backendUrl}/wallet/chek-pin`, {
+      method: "GET",
+      headers, // include your token header
+    });
+
+    const data = await res.json();
+
+    if (!data.hasPin) {
+      // Redirect to create PIN page
+      window.location.href = "/transactionPin.html";
+    } else {
+      // Show withdrawal modal/form
+      document.getElementById("withdrawModal").style.display = "flex";
+    }
+  } catch (err) {
+    alert("Error checking PIN. Please try again.");
+  }
+});
+
+
+
+
+
+// Handle Withdraw
+
+document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    bankName: document.getElementById("bankName").value,
+    accountNumber: document.getElementById("accountNumber").value,
+    amount: document.getElementById("withdrawAmount").value,
+    pin: document.getElementById("withdrawPin").value,
+  };
+
+  try {
+    const res = await fetch(`${backendUrl}/wallet/withdraw`, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Withdrawal failed");
+
+    alert("Withdrawal request sent successfully!");
+    closeWithdrawModal();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+function closeWithdrawModal() {
+  document.getElementById("withdrawModal").style.display = "none";
+}
+
+
+
+
+
+ // Handle transfer to wallet click
 
 transferBtn.addEventListener("click", async () => {
   try {
@@ -504,8 +608,6 @@ transferBtn.addEventListener("click", async () => {
     loadingIndicator.style.display = "none";
   }
 });
-
-
 
 
     // Handle Wallet-to-Wallet Transfer
