@@ -270,6 +270,86 @@
       <button id="transferBtn" class="wallet-action-btn">Transfer</button>
     </div>
   
+
+
+
+<!-- Custom Popup Modal -->
+<div id="pinPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; border-radius:10px; text-align:center; width:90%; max-width:300px;">
+    <p>You need to create a transaction PIN first.</p>
+    <button onclick="redirectToPin()">OK</button>
+  </div>
+</div>
+
+<!-- Script onclick withdra check pin -->
+<script>
+  document.getElementById("withdrawBtn").addEventListener("click", async () => {
+    try {
+      const res = await fetch(`${backendUrl}/wallet/chek-pin`, {
+        method: "GET",
+        headers, // your auth token headers
+      });
+
+      const data = await res.json();
+
+      if (!data.hasPin) {
+        // Show popup instead of immediate redirect
+        document.getElementById("pinPopup").style.display = "flex";
+      } else {
+        // Show withdrawal modal
+        document.getElementById("withdrawModal").style.display = "flex";
+      }
+    } catch (err) {
+      alert("Error checking PIN. Please try again.");
+    }
+  });
+
+  function redirectToPin() {
+    window.location.href = "/transactionPin.html";
+  }
+
+
+
+  // Handle Withdraw
+
+document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    bankName: document.getElementById("bankName").value,
+    accountNumber: document.getElementById("accountNumber").value,
+    amount: document.getElementById("withdrawAmount").value,
+    pin: document.getElementById("withdrawPin").value,
+  };
+
+  try {
+    const res = await fetch(`${backendUrl}/wallet/withdraw`, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Withdrawal failed");
+
+    alert("Withdrawal request sent successfully!");
+    closeWithdrawModal();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+</script>
+
+
+
+
+
+
+
     <!-- Deposit Form -->
     <div id="depositForm" class="wallet-form" style="display:none;">
       <h3>Deposit via KoraPay</h3>
@@ -614,11 +694,6 @@ fetchBanks();
 
 
 
-
-
-
-
-
     // Handle Deposit
     confirmDeposit.addEventListener("click", async () => {
       const amount = Number(document.getElementById("depositAmount").value);
@@ -649,70 +724,6 @@ fetchBanks();
 
 
 
-// Handle Withdraw Button Click
-
-document.getElementById("withdrawBtn").addEventListener("click", async () => {
-  try {
-    const res = await fetch(`${backendUrl}/wallet/chek-pin`, {
-      method: "GET",
-      headers, // include your token header
-    });
-
-    const data = await res.json();
-
-    if (!data.hasPin) {
-      // Redirect to create PIN page
-      window.location.href = "/transactionPin.html";
-    } else {
-      // Show withdrawal modal/form
-      document.getElementById("withdrawModal").style.display = "flex";
-    }
-  } catch (err) {
-    alert("Error checking PIN. Please try again.");
-  }
-});
-
-
-
-
-
-// Handle Withdraw
-
-document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const payload = {
-    bankName: document.getElementById("bankName").value,
-    accountNumber: document.getElementById("accountNumber").value,
-    amount: document.getElementById("withdrawAmount").value,
-    pin: document.getElementById("withdrawPin").value,
-  };
-
-  try {
-    const res = await fetch(`${backendUrl}/wallet/withdraw`, {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Withdrawal failed");
-
-    alert("Withdrawal request sent successfully!");
-    closeWithdrawModal();
-  } catch (err) {
-    alert(err.message);
-  }
-});
-
- 
-
-
-
-
 
  // Handle transfer to wallet click
 
@@ -723,7 +734,6 @@ transferBtn.addEventListener("click", async () => {
       method: "GET",
       headers,
     });
-
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.message || "Failed to verify PIN");
@@ -731,9 +741,10 @@ transferBtn.addEventListener("click", async () => {
     if (data.hasPin) {
       transferForm.style.display = "block";
     } else {
-      if (confirm("Create transaction pin first")) {
-        window.location.href = "transactionPin.html";
-      }
+      // show an alert with only “OK”
+      alert("You need to create a transaction PIN first");
+      // after they click “OK”, send them to the PIN page:
+      window.location.href = "transactionPin.html";
     }
   } catch (err) {
     alert(err.message || "Error verifying transaction PIN");
