@@ -307,41 +307,7 @@
   function redirectToPin() {
     window.location.href = "/transactionPin.html";
   }
-
-
-
-  // Handle Withdraw
-
-document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const payload = {
-    bankName: document.getElementById("bankName").value,
-    accountNumber: document.getElementById("accountNumber").value,
-    amount: document.getElementById("withdrawAmount").value,
-    pin: document.getElementById("withdrawPin").value,
-  };
-
-  try {
-    const res = await fetch(`${backendUrl}/wallet/withdraw`, {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Withdrawal failed");
-
-    alert("Withdrawal request sent successfully!");
-    closeWithdrawModal();
-  } catch (err) {
-    alert(err.message);
-  }
-});
-
+ 
 </script>
 
 
@@ -396,7 +362,47 @@ document.getElementById("withdrawForm").addEventListener("submit", async (e) => 
 
 
 
+
+
+
+
 <script>
+
+ // Handle Withdraw
+
+document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    bankName: document.getElementById("bankName").value,
+    accountNumber: document.getElementById("accountNumber").value,
+    amount: document.getElementById("withdrawAmount").value,
+    pin: document.getElementById("withdrawPin").value,
+  };
+
+  try {
+    const res = await fetch(`${backendUrl}/wallet/withdraw`, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Withdrawal failed");
+
+    alert("Withdrawal request sent successfully!");
+    closeWithdrawModal();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+
+
+
   function openWithdrawModal() {
     document.getElementById("withdrawModal").style.display = "flex";
   }
@@ -404,6 +410,11 @@ document.getElementById("withdrawForm").addEventListener("submit", async (e) => 
   function closeWithdrawModal() {
     document.getElementById("withdrawModal").style.display = "none";
   }
+
+
+
+
+
 </script>
 
 
