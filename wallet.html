@@ -293,13 +293,9 @@
   <div style="background:#fff; padding:20px; border-radius:10px; width:90%; max-width:400px;">
     <h3>Withdraw Funds</h3>
     <form id="withdrawForm">
-     <select id="bankName" required>
-  <option value="">Select Bank</option>
-  <option value="access-bank">Access Bank</option>
-  <option value="gtbank">GTBank</option>
-  <option value="first-bank">First Bank</option>
-</select>
-
+      <select id="bankSelect">
+        <option value="">Select a Bank</option>
+      </select>
 
       <label>Account Number:</label>
       <input type="text" id="accountNumber" maxlength="10" required />
@@ -312,11 +308,11 @@
 
       <button type="submit">Submit Withdrawal</button>
     </form>
-    <button style="margin-top: 10px;" onclick="closeWithdrawModal()">Cancel</button>
 
+    <!-- Cancel button -->
+    <button style="margin-top: 10px;" onclick="closeWithdrawModal()">Cancel</button>
   </div>
 </div>
-
 
 
 
@@ -571,25 +567,39 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 // Load Banks into Select Dropdown
+async function fetchBanks() { 
+  try {
+    const response = await fetch(`${backendUrl}/wallet/banks`);
+    const result = await response.json();
 
- document.addEventListener("DOMContentLoaded", function () {
-    fetch("https://pch-z6ny.onrender.com/api/wallet/banks") 
-      .then(res => res.json())
-      .then(data => {
-        const select = document.getElementById("bankName");
-        if (!select) return console.warn("Bank select element not found");
+    if (result.status && Array.isArray(result.data)) {
+      const bankSelect = document.getElementById('bankSelect');
 
-        data.data.forEach(bank => {
-          if (bank.active) {
-            const option = document.createElement("option");
-            option.value = bank.code;
-            option.textContent = bank.name;
-            select.appendChild(option);
-          }
-        });
-      })
-      .catch(err => console.error("Failed to load banks:", err));
-  });
+      // 1. Filter to include only active banks
+      const activeBanks = result.data.filter(bank => bank.active);
+
+      // 2. Sort alphabetically by name
+      const sortedBanks = activeBanks.sort((a, b) => a.name.localeCompare(b.name));
+
+      // 3. Populate the select element
+      sortedBanks.forEach(bank => {
+        const option = document.createElement('option');
+        option.value = bank.code;
+        option.textContent = bank.name;
+        bankSelect.appendChild(option);
+      });
+    } else {
+      console.error('Unexpected response:', result);
+    }
+  } catch (error) {
+    console.error('Error fetching banks:', error);
+  }
+}
+
+fetchBanks();
+
+
+
 
 
 
@@ -685,9 +695,13 @@ document.getElementById("withdrawForm").addEventListener("submit", async (e) => 
   }
 });
 
-function closeWithdrawModal() {
-  document.getElementById("withdrawModal").style.display = "none";
-}
+ function openWithdrawModal() {
+    document.getElementById("withdrawModal").style.display = "flex"; // Important!
+  }
+
+  function closeWithdrawModal() {
+    document.getElementById("withdrawModal").style.display = "none";
+  }
 
 
 
