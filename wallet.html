@@ -316,6 +316,19 @@
 
 
 
+<script>
+  function openWithdrawModal() {
+    document.getElementById("withdrawModal").style.display = "flex";
+  }
+
+  function closeWithdrawModal() {
+    document.getElementById("withdrawModal").style.display = "none";
+  }
+</script>
+
+
+
+
   
     <!-- Transaction History -->
     <div class="transactions">
@@ -695,13 +708,7 @@ document.getElementById("withdrawForm").addEventListener("submit", async (e) => 
   }
 });
 
- function openWithdrawModal() {
-    document.getElementById("withdrawModal").style.display = "flex"; // Important!
-  }
-
-  function closeWithdrawModal() {
-    document.getElementById("withdrawModal").style.display = "none";
-  }
+ 
 
 
 
