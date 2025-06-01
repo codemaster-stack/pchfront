@@ -293,14 +293,13 @@
   <div style="background:#fff; padding:20px; border-radius:10px; width:90%; max-width:400px;">
     <h3>Withdraw Funds</h3>
     <form id="withdrawForm">
-      <label>Bank Name:</label>
-      <select id="bankName" required>
-        <option value="">Select Bank</option>
-        <option value="access-bank">Access Bank</option>
-        <option value="gtbank">GTBank</option>
-        <option value="first-bank">First Bank</option>
-        <!-- Add more banks as needed -->
-      </select>
+     <select id="bankName" required>
+  <option value="">Select Bank</option>
+  <option value="access-bank">Access Bank</option>
+  <option value="gtbank">GTBank</option>
+  <option value="first-bank">First Bank</option>
+</select>
+
 
       <label>Account Number:</label>
       <input type="text" id="accountNumber" maxlength="10" required />
@@ -313,7 +312,8 @@
 
       <button type="submit">Submit Withdrawal</button>
     </form>
-    <button style="margin-top: 10px;">Cancel</button>
+    <button style="margin-top: 10px;" onclick="closeWithdrawModal()">Cancel</button>
+
   </div>
 </div>
 
@@ -570,6 +570,30 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
+// Load Banks into Select Dropdown
+
+ document.addEventListener("DOMContentLoaded", function () {
+    fetch("https://pch-z6ny.onrender.com/api/wallet/banks") 
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById("bankName");
+        if (!select) return console.warn("Bank select element not found");
+
+        data.data.forEach(bank => {
+          if (bank.active) {
+            const option = document.createElement("option");
+            option.value = bank.code;
+            option.textContent = bank.name;
+            select.appendChild(option);
+          }
+        });
+      })
+      .catch(err => console.error("Failed to load banks:", err));
+  });
+
+
+
+
 
 
     // Handle Deposit
@@ -742,17 +766,10 @@ transferBtn.addEventListener("click", async () => {
   }
 });
 
-
-    // Initial Load
+    // Initial fetches
     fetchWalletBalance();
     fetchWalletTransactions();
   });
-
-
-
- 
-
-
 
 
 </script>
