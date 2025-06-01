@@ -285,7 +285,7 @@
 <script>
   document.getElementById("withdrawBtn").addEventListener("click", async () => {
     try {
-      const res = await fetch(`${backendUrl}/wallet/chek-pin`, {
+      const res = await fetch(`https://pch-z6ny.onrender.com/api/wallet/chek-pin`, {
         method: "GET",
         headers, // your auth token headers
       });
@@ -362,10 +362,6 @@
 
 
 
-
-
-
-
 <script>
 
  // Handle Withdraw
@@ -374,14 +370,14 @@ document.getElementById("withdrawForm").addEventListener("submit", async (e) => 
   e.preventDefault();
 
   const payload = {
-    bankName: document.getElementById("bankName").value,
+    bankName: document.getElementById("bankSelect").value,  
     accountNumber: document.getElementById("accountNumber").value,
     amount: document.getElementById("withdrawAmount").value,
     pin: document.getElementById("withdrawPin").value,
   };
 
   try {
-    const res = await fetch(`${backendUrl}/wallet/withdraw`, {
+    const res = await fetch(`https://pch-z6ny.onrender.com/api/wallet/withdraw`, {
       method: "POST",
       headers: {
         ...headers,
