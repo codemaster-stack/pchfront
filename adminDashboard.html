@@ -24,6 +24,9 @@
         <li><a href="#" id="fundUserLink">Fund User</a></li>
         <li><a href="#" id="rewardUserLink">Reward Points</a></li>
         <li><a href="#" id="notifyUserLink">Notify User</a></li>
+        <li><a href="#" id="manageHeroPostsLink">Manage Hero Comments</a></li>
+        <li><a href="#" id="spinToWinLink">Spin to Win</a></li>
+        <li><a href="#" id="pickNumberLink">Pick a Number Monitor</a></li>
 
 
         <li id="logoutBtn"><a href="index.html">Logout</a></li>
@@ -77,6 +80,25 @@
   </div>
   
 </section>
+
+
+<!--Add Advertisement Section -->
+<section id="addAdvertisementSection" style="display: none;">
+  <h2>Post Advertisement</h2>
+  <form id="addAdForm" enctype="multipart/form-data">
+    <input type="text" placeholder="Title" required />
+    <textarea placeholder="Description" required></textarea>
+    <input type="file" accept="image/*,video/*" required />
+    <button type="submit">Post Advertisement</button>
+  </form>
+
+  <h3>Manage Advertisements</h3>
+  <div id="adManagementBox">
+    <!-- Ads will show here with option to delete -->
+  </div>
+</section>
+
+
 
 
 <!-- User Detail Modal --> 
@@ -768,7 +790,7 @@ showSection(sections.getLatestPosts); // Make sure to show the section after ren
   </script>
   
 <!--Start of Tawk.to Script-->
-<script type="text/javascript">
+<!-- <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
     var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
@@ -779,9 +801,9 @@ showSection(sections.getLatestPosts); // Make sure to show the section after ren
     s0.parentNode.insertBefore(s1,s0);
     })();
     </script>
-    <!--End of Tawk.to Script-->
+    End of Tawk.to Script
  
-</script>
+</script> -->
 
 </body>
 </html>
