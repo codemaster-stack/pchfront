@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Points</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #f5f8ff;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #1a237e;
+    }
+
+    .points-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      background: #e8f0fe;
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+    }
+
+    .points-info div {
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .actions button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background-color: #1a73e8;
+      color: white;
+      font-weight: 600;
+      border-radius: 8px;
+      margin-right: 1rem;
+      cursor: pointer;
+    }
+
+    .actions button:hover {
+      background-color: #0f5bd4;
+    }
+
+    .referral-section {
+      margin-top: 3rem;
+    }
+
+    .referral-link {
+      background: #f1f3f4;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .leaderboard {
+      margin-top: 3rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #e3e8ff;
+      color: #1a237e;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 My Points Dashboard</h1>
+
+    <div class="points-info">
+      <div>Points: <span id="points">--</span></div>
+      <div>Expires In: <span id="expires">--</span> days</div>
+    </div>
+
+    <div class="actions">
+      <button onclick="redeemPoints()">Use 5 Points to Stake</button>
+      <button onclick="convertPoints()">Convert Points to Cash</button>
+    </div>
+
+    <div class="referral-section">
+      <h2>💡 Invite & Earn</h2>
+      <p>Refer 20 friends who fund wallet + stake to earn ₦3000 bonus or 20 points!</p>
+      <div class="referral-link">
+        <span id="refLink">https://pch-gamma.vercel.app/register?ref=USER123</span>
+        <button onclick="copyRefLink()">Copy</button>
+      </div>
+    </div>
+
+    <div class="leaderboard">
+      <h2>🏆 Top Point Earners</h2>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Points</th></tr>
+        </thead>
+        <tbody id="leaderboard">
+          <tr><td>Loading...</td><td>--</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Example loading
+    async function loadPoints() {
+      try {
+        const res = await fetch('/api/points', { headers: { Authorization: localStorage.getItem('token') } });
+        const data = await res.json();
+        document.getElementById('points').textContent = data.points;
+        document.getElementById('expires').textContent = data.expiresInDays;
+      } catch (err) {
+        console.error('Failed to load points');
+      }
+    }
+
+    async function redeemPoints() {
+      if (confirm('Use 5 points to stake?')) {
+        await fetch('/api/points/redeem', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: localStorage.getItem('token') },
+        });
+        loadPoints();
+      }
+    }
+
+    async function convertPoints() {
+      if (confirm('Convert points to cash (₦150 per point)?')) {
+        await fetch('/api/points/convert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: localStorage.getItem('token') },
+        });
+        loadPoints();
+      }
+    }
+
+    function copyRefLink() {
+      const refText = document.getElementById('refLink').textContent;
+      navigator.clipboard.writeText(refText).then(() => alert('Referral link copied!'));
+    }
+
+    window.onload = loadPoints;
+  </script>
+</body>
+</html>

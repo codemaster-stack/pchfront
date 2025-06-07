@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +6,220 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PCH Style Sweepstakes</title>
   <link rel="stylesheet" href="./user.css" />
+
+
+
+<style>
+
+  .notification {
+  position: relative;
+  cursor: pointer;
+}
+
+.bell-icon {
+  font-size: 20px;
+}
+
+.badge {
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  font-size: 12px;
+}
+
+#notificationPanel {
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background: #fff;
+  border: 1px solid #ccc;
+  width: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+
+.comment-ticker {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  z-index: 9999;
+  overflow: hidden;
+  pointer-events: none; /* makes sure users can still scroll/click page underneath */
+}
+
+.ticker-content {
+  display: inline-flex;
+  animation: scroll-left 40s linear infinite;
+  gap: 50px;
+}
+
+.comment {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1); /* optional light blur background */
+  border-radius: 30px;
+  backdrop-filter: blur(3px);
+  color: #fff;
+  white-space: nowrap;
+  font-size: 14px;
+  pointer-events: auto;
+}
+
+.comment img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #fff;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-200%);
+  }
+}
+
+
+
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+
+    #wheel {
+      margin: 20px auto;
+      border: 10px solid gold;
+      border-radius: 50%;
+      width: 500px;
+      height: 500px;
+      position: relative;
+    }
+
+    #wheelCanvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    #spinButton {
+      margin-top: 20px;
+      padding: 15px 30px;
+      font-size: 20px;
+      background-color: gold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #result {
+      font-size: 24px;
+      margin-top: 30px;
+      font-weight: bold;
+    }
+
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 40px solid red;
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  
+
+    body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #f0f0f0;
+}
+
+.main-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.spin-section,
+
+.advert-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#adsContainer img,
+#adsContainer video {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  margin-bottom: 15px;
+}
+
+
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 10px;
+  margin: 20px auto;
+  max-width: 90vw;
+  padding: 10px;
+}
+
+.number {
+  background: #222;
+  border: 2px solid #444;
+  padding: 15px;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 8px;
+  transition: 0.3s;
+  color: #fff;
+}
+
+.number:hover {
+  background: #333;
+}
+
+.picked {
+  background: #0f0 !important;
+  color: #000;
+  pointer-events: none;
+}
+
+
+
+
+  </style>
+
+
 </head>
 
 <body>
@@ -25,52 +240,282 @@
       <nav class="nav">
         <ul class="nav-list">
           <li><a href="#">Home</a></li>
-          <li id="sweepstakeBtn"><a href="sweepstaks.html">Sweepstakes</a></li>
-          <li><a href="#">Winners</a></li>
+          <li><a href="/winners.html">Winners</a></li>
           <li><a href="#">Points</a></li>
           <li><a href="/wallet.html">Wallet</a></li> 
           <li id="logoutBtn"><a href="index.html">Logout</a></li>
         </ul>
       </nav>
+
+
   
       <!-- New Icons Area -->
-      <div class="user-icons">
-        <!-- Notification Bell -->
-        <div class="notification">
-          <span class="bell-icon">&#128276;</span>
-          <span class="badge" id="notificationCount">2</span>
-        </div>
-  
-        <!-- Profile Picture -->
-        <div class="profile">
-          <img src="images/pch3d.jpg" alt="Profile" class="profile-pic" />
-          <!-- Optional initials version:
-          <div class="profile-initials">JD</div> -->
-        </div>
-      </div>
+     <div class="notification" onclick="openNotificationPanel()">
+  <span class="bell-icon">&#128276;</span>
+  <span class="badge" id="notificationCount"></span>
+
+
+</div>
+<div id="notificationPanel" style="display:none;"></div>
+
+
+
+
+  <!-- Profile Picture -->
+  <div class="profile" id="profileIcon" style="cursor: pointer;">
+    <img src="images/pch3d.jpg" alt="Profile" class="profile-pic" />
+  </div>
+</div>
+
     </div>
   </header>
   
 
-  <!-- Hero Section -->
-  <section class="hero">  
-    <div class="hero-overlay" id="heroOverlay">
-      <div class="hero-content">
-        <!-- Dynamically updated title and subtitle -->
-        <h1 id="heroTitle">Loading...</h1>
-        <p id="heroSubtitle">Please wait</p>
-        <!-- Dynamically updated button -->
-        <a id="heroCta" href="#" class="btn-enter">Loading...</a>
+<!-- Hidden profile details section -->
+<div id="profileDetails" style="display: none; padding: 1em; border: 1px solid #ccc; background: #f9f9f9;">
+  <h3>User Profile</h3>
+  <p><strong>Email:</strong> <span id="userEmail"></span></p>
+  <p><strong>Phone:</strong> <span id="userPhone"></span></p>
+  <p><strong>Address:</strong> <span id="userAddress"></span></p>
+  <p><strong>Account Number:</strong> <span id="userAccount"></span></p>
+  <p><strong>Bank Name:</strong> <span id="userBank"></span></p>
+</div>
+
+
+
+<script>
+
+// Notification Panel functionality
+
+const toke = localStorage.getItem('token'); // or your auth method
+
+async function fetchNotifications() {
+  const res = await fetch('https://pch-z6ny.onrender.com/api/user/notiice', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  const data = await res.json();
+  const unreadCount = data.filter(n => !n.isRead).length;
+
+  document.getElementById('notificationCount').textContent = unreadCount;
   
-        <!-- Countdown Timer -->
-        <div class="countdown">
-          <p>Next draw in: <span id="timer">Loading...</span></p>
-        </div>
-      </div>   
+  const panel = document.getElementById('notificationPanel');
+  panel.innerHTML = data.map(n => `
+    <div class="notification-item ${n.isRead ? 'read' : 'unread'}">
+      ${n.message}
     </div>
-  </section>
+  `).join('');
+}
+
+function openNotificationPanel() {
+  const panel = document.getElementById('notificationPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+
+  // Optionally mark as read
+  fetch('/api/notifications/mark-read', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }
+  }).then(() => fetchNotifications());
+}
+
+fetchNotifications();
+
+
+
+
+
+  // Function for user to view their profile
+  document.getElementById('profileIcon').addEventListener('click', async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('https://pch-z6ny.onrender.com/api/user/viewProfile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) {
+        alert('Failed to load profile');
+        return;
+      }
+
+      const data = await res.json();
+      document.getElementById('userEmail').textContent = data.email;
+      document.getElementById('userPhone').textContent = data.phone;
+      document.getElementById('userAddress').textContent = data.address;
+      document.getElementById('userAccount').textContent = data.accountNumber;
+      document.getElementById('userBank').textContent = data.bankName;
+
+      document.getElementById('profileDetails').style.display = 'block';
+    } catch (err) {
+      console.error('Error fetching profile:', err);
+    }
+  });
+</script>
+
+
+
+
+
+  <!-- Hero Section -->
+  <section class="hero">   
+  <div class="hero-overlay" id="heroOverlay">
+    <div class="hero-content">
+      <img id="heroImage" src="" alt="Hero Image" style="width: 100%; height: auto; border-radius: 8px;" />
+      
+      <h1 id="heroTitle">Loading...</h1>
+      <p id="heroSubtitle">Please wait</p>
+      <a id="heroCta" href="#" class="btn-enter">Loading...</a>
+
+      <p class="stake-amount">Stake Amount: ₦<span id="stakeAmount">0</span></p>
+
+      <!-- 👇 Reactions -->
+      <div class="reactions">
+        <button class="emoji-btn" data-emoji="👍">👍</button>
+        <button class="emoji-btn" data-emoji="❤️">❤️</button>
+        <button class="emoji-btn" data-emoji="😂">😂</button>
+        <button class="emoji-btn" data-emoji="🔥">🔥</button>
+      </div>
+
+      <!-- 👇 Share -->
+      <div class="share-section">
+        <button onclick="shareHeroPost()">🔗 Share</button>
+      </div>
+
+      <!-- 👇 Comments -->
+      <div class="comments-section">
+        <form id="commentForm">
+          <input type="text" id="commentInput" placeholder="Write a comment..." required />
+          <button type="submit">Post</button>
+        </form>
+        <div id="commentsList">
+          <!-- Comments will be dynamically inserted here -->
+        </div>
+      </div>
+    </div>   
+  </div>
+</section>
+
+
+
+<script> // Hero Section comment and reaction functionality
+
+  let currentPostId = ""; // Set after fetching the hero post
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      // STEP 1: Fetch the hero post
+      const res = await fetch("https://pch-z6ny.onrender.com/api/user/coment/");
+      const post = await res.json();
+      currentPostId = post._id;
+
+      // Fill hero content
+      document.getElementById("heroTitle").textContent = post.title;
+      document.getElementById("heroSubtitle").textContent = post.subtitle;
+      document.getElementById("heroCta").textContent = post.ctaText;
+      document.getElementById("heroCta").href = `/stake/${post._id}`;
+      
+      // Fetch comments for the post
+      loadComments();
+
+    } catch (err) {
+      console.error("Hero post load error", err);
+    }
+  });
+
+  // Load existing comments
+  async function loadComments() {
+    try {
+      const res = await fetch(`https://pch-z6ny.onrender.com/api/hero-posts/${currentPostId}/comments`);
+      const comments = await res.json();
+
+      const list = document.getElementById("commentsList");
+      list.innerHTML = ""; // Clear previous
+
+      comments.forEach(c => {
+        const el = document.createElement("div");
+        el.classList.add("comment");
+        el.innerHTML = `<strong>${c.name}</strong><p>${c.comment}</p>`;
+        list.appendChild(el);
+      });
+    } catch (err) {
+      console.error("Comment load error", err);
+    }
+  }
+
+  // Handle comment submission
+  document.getElementById("commentForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("commentName").value;
+    const comment = document.getElementById("commentText").value;
+
+    try {
+      const res = await fetch(`https://pch-z6ny.onrender.com/api/hero-posts/${currentPostId}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, comment })
+      });
+
+      if (res.ok) {
+        document.getElementById("commentForm").reset();
+        loadComments(); // reload after submit
+      } else {
+        alert("Failed to post comment");
+      }
+    } catch (err) {
+      console.error("Comment post error", err);
+    }
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
+
   
-  
+  <!-- This JavaScript should run when the user clicks “Check Draw Potential Winner!” -->
+<script>
+
+document.getElementById('checkWinnerBtn').addEventListener('click', async () => {
+  const postId = localStorage.getItem('selectedPostId'); // or however you're storing it
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/draw/${postId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (data.isWinner) {
+      localStorage.setItem('winnerData', JSON.stringify(data));
+      window.location.href = '/winner.html';
+    } else {
+      localStorage.setItem('winnerData', JSON.stringify(data));
+      window.location.href = '/betterluck.html';
+    }
+
+  } catch (err) {
+    alert('Something went wrong checking winner');
+    console.error(err);
+  }
+});
+
+</script>
+
+
+
 
 <section class="how-it-works" id="how-it-works">
     <div class="container">
@@ -94,62 +539,396 @@
       </div>
     </div>
   </section>
-  <section class="testimonial-section">
-    <h2>What Our Winners Say</h2>
-    <div class="testimonial-slider" id="testimonialSlider">
-      <div class="testimonial-slide active">
-        <!-- Slide 1 Testimonials -->
-        <div class="testimonial">
-          <img src="images/testimo.jpg" alt="Winner 1">
-          <p>“I just won $10,000! Thanks LuckyWin!”</p>
-          <span>- Sarah J.</span>
-        </div>
-        <div class="testimonial">
-          <img src="images/enterph.jpg" alt="Winner 2">
-          <p>“Unbelievable experience. I’m telling everyone!”</p>
-          <span>- Mike T.</span>
+
+  
+<div class="comment-ticker"> 
+  <div class="ticker-content" id="ticker-content">
+    <div class="comment">
+      <img src="https://via.placeholder.com/30" alt="User" />
+      <span>🎉 Aisha from Lagos just won ₦50,000!</span>
+    </div>
+    <div class="comment">
+      <img src="https://via.placeholder.com/30" alt="User" />
+      <span>💰 Musa from Abuja just earned 500 points!</span>
+    </div>
+    <div class="comment">
+      <img src="https://via.placeholder.com/30" alt="User" />
+      <span>🏆 Grace from Enugu won a free entry!</span>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const ticker = document.getElementById("ticker-content");
+
+  try {
+    const res = await fetch("https://pch-z6ny.onrender.com/api/post/comments");
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      ticker.innerHTML = "<div class='comment'>No comments yet</div>";
+      return;
+    }
+
+    // Clear any existing content
+    ticker.innerHTML = "";
+
+    data.forEach(comment => {
+      const commentEl = document.createElement("div");
+      commentEl.classList.add("comment");
+      commentEl.innerHTML = `
+        <img src="${comment.image}" alt="${comment.name}" />
+        <span>🎉 ${comment.name} from ${comment.location} ${comment.message}</span>
+      `;
+      ticker.appendChild(commentEl);
+    });
+  } catch (error) {
+    console.error("Failed to load comments:", error);
+    ticker.innerHTML = "<div class='comment'>Error loading comments</div>";
+  }
+});
+</script>
+
+
+
+<div class="main-section">
+    
+    <!-- Spin Wheel Section -->
+     <div class="spin-section">
+   <h1>Spin With #500.00 to Win!</h1>
+  <div id="wheel">
+    <canvas id="wheelCanvas" width="500" height="500"></canvas>
+    <div class="pointer"></div>
+  </div>
+  <button id="spinButton">Spin</button>
+  <div id="result"></div>
+  <audio id="spinSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_c68224a09f.mp3"></audio>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</div>
+
+    <!-- Advert Section -->
+    <div class="advert-section">
+      <h2>Sponsored Ads</h2>
+      <div id="adsContainer">
+        <!-- Ads will be loaded dynamically -->
+
+
+        <div class="reactions">
+        <button class="emoji-btn" data-emoji="👍">👍</button>
+        <button class="emoji-btn" data-emoji="❤️">❤️</button>
+        <button class="emoji-btn" data-emoji="😂">😂</button>
+        <button class="emoji-btn" data-emoji="🔥">🔥</button>
+      </div>
+
+      <!-- 👇 Share -->
+      <div class="share-section">
+        <button onclick="shareHeroPost()">🔗 Share</button>
+      </div>
+
+      <!-- 👇 Comments -->
+      <div class="comments-section">
+        <form id="commentForm">
+          <input type="text" id="commentInput" placeholder="Write a comment..." required />
+          <button type="submit">Post</button>
+        </form>
+        <div id="commentsList">
+          <!-- Comments will be dynamically inserted here -->
         </div>
       </div>
-  
-      <div class="testimonial-slide">
-        <!-- Slide 2 Testimonials -->
-        <div class="testimonial">
-          <img src="images/testimo.jpg" alt="Winner 3">
-          <p>“I never thought I'd win. Dreams do come true!”</p>
-          <span>- Diana L.</span>
-        </div>
-        <div class="testimonial">
-          <img src="images/testimo.jpg" alt="Winner 4">
-          <p>“Got my check in the mail! Love this site.”</p>
-          <span>- Carl P.</span>
-        </div>
-      </div>
-  
-      <div class="testimonial-slide">
-        <!-- Slide 3 Testimonials -->
-        <div class="testimonial">
-          <img src="images/pch.jpg" alt="Winner 5">
-          <p>“Easy to use and totally legit!”</p>
-          <span>- Janet Q.</span>
-        </div>
-        <div class="testimonial">
-          <img src="images/testimo.jpg" alt="Winner 6">
-          <p>“I entered every day and finally won!”</p>
-          <span>- Travis K.</span>
-        </div>
       </div>
     </div>
-  </section>
-  
-  
-  
-  <section class="testimonials">
-    <h2>What Our Winners Say</h2>
-    <div class="testimonial-container" id="testimonial-container">
-      <img src="images/testimo.jpg" alt="Winner Photo" class="testimonial-img" id="testimonial-img">
-      <p id="testimonial-text">"I couldn't believe it! I entered just once and won $5,000. Thank you!"</p>
-      <h4 id="testimonial-name">- Sarah M., New York</h4>
-    </div>
+
+  </div>
+
+
+
+<script>//spin wheel functionality
+
+  async function spinWheel() {
+  if (spinning) return;
+  spinning = true;
+
+  const token = localStorage.getItem("token"); // or replace with cookie logic if needed
+
+  try {
+    const response = await fetch("https://pch-z6ny.onrender.com/api/spin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      spinning = false;
+      alert(data.message || "Something went wrong.");
+
+      if (data.message.includes("Insufficient")) {
+        if (confirm("Insufficient balance. Go to wallet to fund?")) {
+          window.location.href = "wallet.html";
+        }
+      }
+
+      return;
+    }
+
+    const selectedLabel = data.result.label;
+    const selectedWin = data.result.win;
+    const amountWon = data.result.amountWon;
+
+    const selectedIndex = segments.findIndex(s => s.label === selectedLabel);
+    if (selectedIndex === -1) {
+      alert("Spin error: result mismatch.");
+      spinning = false;
+      return;
+    }
+
+    playSpinSound();
+
+    const randomOffset = Math.random();
+    const targetAngle = (2 * Math.PI) - (selectedIndex + randomOffset) * anglePerSegment + (3 * Math.PI / 2);
+    const totalRotation = 10 * 2 * Math.PI + targetAngle;
+    const spinTime = 4000;
+    const start = performance.now();
+
+    function animate(time) {
+      const progress = (time - start) / spinTime;
+      if (progress < 1) {
+        const eased = easeOut(progress);
+        rotation = totalRotation * eased;
+        ctx.clearRect(0, 0, 500, 500);
+        ctx.save();
+        ctx.translate(250, 250);
+        ctx.rotate(rotation);
+        ctx.translate(-250, -250);
+        drawWheel();
+        ctx.restore();
+        requestAnimationFrame(animate);
+      } else {
+        document.getElementById("result").innerText = selectedWin
+          ? `🎉 You won: ${selectedLabel} (+₦${amountWon.toLocaleString()})!`
+          : `😢 Result: ${selectedLabel}`;
+
+        if (selectedWin) startConfetti();
+
+        // Optional: update balance in header, etc.
+        // document.getElementById("balance").innerText = "₦" + data.newBalance;
+
+        spinning = false;
+      }
+    }
+
+    requestAnimationFrame(animate);
+
+  } catch (error) {
+    spinning = false;
+    alert("Something went wrong. Please try again.");
+    console.error(error);
+  }
+}
+
+
+
+
+
+
+
+// advertisement section
+
+window.onload = async function () {
+  const adsContainer = document.getElementById('adsContainer');
+
+  try {
+    const response = await fetch('https://pch-z6ny.onrender.com/admin/all');
+    const data = await response.json();
+
+    if (Array.isArray(data.ads)) {
+      data.ads.forEach(ad => {
+        const caption = document.createElement('p');
+        caption.textContent = ad.caption;
+
+        let media;
+        if (ad.media.endsWith('.mp4')) {
+          media = document.createElement('video');
+          media.controls = true;
+        } else {
+          media = document.createElement('img');
+        }
+
+        media.src = `http://localhost:YOUR_PORT/${ad.media}`;
+        adsContainer.appendChild(media);
+        adsContainer.appendChild(caption);
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching ads:', error);
+  }
+};
+
+
+  </script>
+
+
+
+  <h1>Pick a Number (1 - 100)</h1>
+
+<div class="grid" id="numberGrid"></div>
+
+<div class="hidden-box" id="hiddenBox">
+  Hidden Number: <span id="hiddenValue">???</span>
+</div>
+
+<br>
+<button class="reveal-button" id="revealBtn" style="display: none;">Reveal Hidden Number</button>
+
+<!-- Winner Modal -->
+<div id="winnerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:1000;">
+  <div style="background:white; padding:30px; text-align:center; border-radius:10px;">
+    <img src="https://i.imgur.com/OYVpe2W.png" width="100" />
+    <h2 id="winnerMessage">🎉 You Win!</h2>
+    <p>Reloading in <span id="countdown">5</span> seconds...</p>
+  </div>
+</div>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f2f2f2;
+    margin: 0;
+    padding: 20px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+    gap: 10px;
+    margin: 20px auto;
+    width: 100vw;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  .number {
+    background: #222;
+    border: 2px solid #444;
+    padding: 15px;
+    font-size: 18px;
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.3s;
+  }
+
+  .number:hover {
+    background: #444;
+  }
+
+  .picked {
+    background: #0f0;
+    color: #000;
+    pointer-events: none;
+  }
+
+  .hidden-box {
+    margin-top: 20px;
+    font-size: 20px;
+  }
+
+  .reveal-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: gold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .reveal-button:hover {
+    background: #f7c600;
+  }
+</style>
+
+<script>
+  const grid = document.getElementById('numberGrid');
+  const revealBtn = document.getElementById('revealBtn');
+  const hiddenValueSpan = document.getElementById('hiddenValue');
+
+  const totalNumbers = 100;
+  let pickedNumbers = new Set();
+  const hiddenNumber = Math.floor(Math.random() * 100) + 1;
+
+  const numbers = Array.from({ length: totalNumbers }, (_, i) => i + 1)
+    .sort(() => Math.random() - 0.5);
+
+  numbers.forEach((num) => {
+    const btn = document.createElement('div');
+    btn.classList.add('number');
+    btn.innerText = num;
+    btn.onclick = () => {
+      if (!pickedNumbers.has(num)) {
+        pickedNumbers.add(num);
+        btn.classList.add('picked');
+        if (pickedNumbers.size === totalNumbers) {
+          revealBtn.style.display = 'inline-block';
+        }
+      }
+    };
+    grid.appendChild(btn);
+  });
+
+  revealBtn.onclick = () => {
+    hiddenValueSpan.innerText = hiddenNumber;
+    [...document.getElementsByClassName('number')].forEach(el => {
+      if (parseInt(el.innerText) === hiddenNumber) {
+        el.style.background = '#ff0';
+        el.style.fontWeight = 'bold';
+      }
+    });
+    showWinnerPopup(hiddenNumber);
+  };
+
+  function showWinnerPopup(winningNumber) {
+    const modal = document.getElementById('winnerModal');
+    const message = document.getElementById('winnerMessage');
+    const countdownEl = document.getElementById('countdown');
+
+    message.innerHTML = `🎉 Congratulations! The winning number is <strong>${winningNumber}</strong>`;
+    modal.style.display = 'flex';
+
+    let secondsLeft = 5;
+    const countdown = setInterval(() => {
+      secondsLeft--;
+      countdownEl.textContent = secondsLeft;
+      if (secondsLeft <= 0) {
+        clearInterval(countdown);
+        location.reload(); // Auto reload
+      }
+    }, 1000);
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
   
   
   <footer class="footer">

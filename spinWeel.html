@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spin to Win Wheel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+
+    #wheel {
+      margin: 20px auto;
+      border: 10px solid gold;
+      border-radius: 50%;
+      width: 500px;
+      height: 500px;
+      position: relative;
+    }
+
+    #wheelCanvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    #spinButton {
+      margin-top: 20px;
+      padding: 15px 30px;
+      font-size: 20px;
+      background-color: gold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #result {
+      font-size: 24px;
+      margin-top: 30px;
+      font-weight: bold;
+    }
+
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 40px solid red;
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  </style>
+</head>
+<body>
+  <h1>Spin to Win!</h1>
+  <div id="wheel">
+    <canvas id="wheelCanvas" width="500" height="500"></canvas>
+    <div class="pointer"></div>
+  </div>
+  <button id="spinButton">Spin</button>
+  <div id="result"></div>
+  <audio id="spinSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_c68224a09f.mp3"></audio>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <script>
+    const wheelCanvas = document.getElementById("wheelCanvas");
+    const ctx = wheelCanvas.getContext("2d");
+
+    const segments = [
+      { label: "Car", color: "#e6194B", icon: "🚗", win: true },
+      { label: "Try Again", color: "#ffffff", icon: "❌", win: false },
+      { label: "iPhone 15", color: "#3cb44b", icon: "📱", win: true },
+      { label: "No Win", color: "#ffffff", icon: "😢", win: false },
+      { label: "Movie Ticket", color: "#ffe119", icon: "🎫", win: true },
+      { label: "Missed", color: "#ffffff", icon: "❌", win: false },
+      { label: "Fridge", color: "#4363d8", icon: "🢨", win: true },
+      { label: "Better Luck", color: "#ffffff", icon: "🙁", win: false },
+      { label: "Comedy Show", color: "#9A6324", icon: "😂", win: true },
+      { label: "Try Again", color: "#ffffff", icon: "❌", win: false }
+    ];
+
+    const anglePerSegment = (2 * Math.PI) / segments.length;
+    let rotation = 0;
+    let spinning = false;
+    let spinCount = 0;
+
+    function drawWheel() {
+      for (let i = 0; i < segments.length; i++) {
+        const startAngle = i * anglePerSegment;
+        const endAngle = startAngle + anglePerSegment;
+
+        ctx.beginPath();
+        ctx.fillStyle = segments[i].color;
+        ctx.moveTo(250, 250);
+        ctx.arc(250, 250, 240, startAngle, endAngle);
+        ctx.lineTo(250, 250);
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(250, 250);
+        ctx.rotate(startAngle + anglePerSegment / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "black";
+        ctx.font = "16px Arial";
+        ctx.fillText(segments[i].icon + " " + segments[i].label, 230, 10);
+        ctx.restore();
+      }
+    }
+
+    function easeOut(t) {
+      return 1 - Math.pow(1 - t, 4);
+    }
+
+    function playSpinSound() {
+      const sound = document.getElementById("spinSound");
+      sound.currentTime = 0;
+      sound.play();
+    }
+
+    function startConfetti() {
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
+
+    function spinWheel() {
+      if (spinning) return;
+      spinning = true;
+      playSpinSound();
+
+      const lossIndices = segments.map((s, i) => !s.win ? i : null).filter(i => i !== null);
+      const winIndices = segments.map((s, i) => s.win ? i : null).filter(i => i !== null);
+
+      const forcedIndex = (spinCount + 1) % 10 === 0
+        ? winIndices[Math.floor(Math.random() * winIndices.length)]
+        : lossIndices[Math.floor(Math.random() * lossIndices.length)];
+
+      spinCount++;
+
+      const randomOffset = Math.random();
+      const targetAngle = (2 * Math.PI) - (forcedIndex + randomOffset) * anglePerSegment + (3 * Math.PI / 2);
+      const totalRotation = 10 * 2 * Math.PI + targetAngle;
+      const spinTime = 4000;
+      const start = performance.now();
+
+      function animate(time) {
+        const progress = (time - start) / spinTime;
+        if (progress < 1) {
+          const eased = easeOut(progress);
+          rotation = totalRotation * eased;
+          ctx.clearRect(0, 0, 500, 500);
+          ctx.save();
+          ctx.translate(250, 250);
+          ctx.rotate(rotation);
+          ctx.translate(-250, -250);
+          drawWheel();
+          ctx.restore();
+          requestAnimationFrame(animate);
+        } else {
+          const finalAngle = (rotation % (2 * Math.PI));
+          const pointerAngle = (3 * Math.PI) / 2;
+          const angleFromPointer = (2 * Math.PI + pointerAngle - finalAngle) % (2 * Math.PI);
+          const index = Math.floor(angleFromPointer / anglePerSegment);
+          const selected = segments[index];
+
+          document.getElementById("result").innerText = `You got: ${selected.label}!`;
+          if (selected.win) startConfetti();
+          spinning = false;
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    drawWheel();
+    document.getElementById("spinButton").addEventListener("click", spinWheel);
+  </script>
+</body>
+</html>

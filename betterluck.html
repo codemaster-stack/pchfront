@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>😔 Better Luck Next Time</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('/images/betterluck-bg.jpg') center/cover no-repeat;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .info-card {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+    }
+    img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="info-card">
+    <img id="profilePicture" src="" alt="Winner Picture" />
+    <h1>😔 Better Luck Next Time</h1>
+    <p>Our lucky winner for:</p>
+    <h2 id="subtitle"></h2>
+    <p><strong>Name:</strong> <span id="name"></span></p>
+    <p><strong>Phone:</strong> <span id="phone"></span></p>
+    <p><strong>Address:</strong> <span id="address"></span></p>
+    <button onclick="goBack()">OK</button>
+  </div>
+
+  <script>
+    const data = JSON.parse(localStorage.getItem('winnerData'));
+
+    if (data) {
+      document.getElementById('subtitle').textContent = data.subtitle;
+      document.getElementById('name').textContent = data.name;
+      document.getElementById('phone').textContent = data.phone;
+      document.getElementById('address').textContent = data.address;
+      document.getElementById('profilePicture').src = data.profilePicture || '/images/default-user.png';
+    }
+
+    function goBack() {
+      window.location.href = '/user.html';
+    }
+  </script>
+</body>
+</html>

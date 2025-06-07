@@ -20,6 +20,11 @@
         <li><a href="#" id="winnersLink">Winners</a></li>
         <li><a href="#" id="addSweepstakeLink">Add Sweepstakes</a></li>
         <li><a href="#" id="getLatestPosts">Get latest-post</a></li>
+        <li><a href="#" id="addAdvertisementLink">Add Advertisement</a></li>
+        <li><a href="#" id="fundUserLink">Fund User</a></li>
+        <li><a href="#" id="rewardUserLink">Reward Points</a></li>
+        <li><a href="#" id="notifyUserLink">Notify User</a></li>
+
 
         <li id="logoutBtn"><a href="index.html">Logout</a></li>
       </ul>
@@ -372,11 +377,11 @@ function renderUsers(users) {
 
 
 // Modify the showSection to ensure users are loaded when "Manage Users" is clicked
-document.getElementById('manageUsersLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  showSection(sections.manageUsers); // Show the manage users section
-  fetchUsers(); // Fetch users from the backend
-});
+//  document.getElementById('manageUsersLink').addEventListener('click', (e) => {
+//   e.preventDefault();
+//   showSection(sections.manageUsers); // Show the manage users section
+//   fetchUsers(); // Fetch users from the backend
+// });
 
 
 
@@ -533,7 +538,7 @@ function searchUsers() {
   const searchTerm = document.getElementById("searchInput").value.toLowerCase();
 
   const filtered = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm) ||
+    user.fullName.toLowerCase().includes(searchTerm) ||
     user.email.toLowerCase().includes(searchTerm)
   );
 
