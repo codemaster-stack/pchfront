@@ -9,30 +9,7 @@
 <body>
 
   <div class="dashboard">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <h2>Admin</h2>
-      <ul>
-        <li><a href="#" id="dashboardLink">Dashboard</a></li>
-        <li><a href="#" id="manageUsersLink">Manage Users</a></li>
-        <li><a href="#" id="addPostLink">Add Post</a></li>
-        <li><a href="#" id="testimonialsLink">Testimonials</a></li>
-        <li><a href="#" id="winnersLink">Winners</a></li>
-        <li><a href="#" id="addSweepstakeLink">Add Sweepstakes</a></li>
-        <li><a href="#" id="getLatestPosts">Get latest-post</a></li>
-        <li><a href="#" id="addAdvertisementLink">Add Advertisement</a></li>
-        <li><a href="#" id="fundUserLink">Fund User</a></li>
-        <li><a href="#" id="rewardUserLink">Reward Points</a></li>
-        <li><a href="#" id="notifyUserLink">Notify User</a></li>
-        <li><a href="#" id="manageHeroPostsLink">Manage Hero Comments</a></li>
-        <li><a href="#" id="spinToWinLink">Spin to Win</a></li>
-        <li><a href="#" id="pickNumberLink">Pick a Number Monitor</a></li>
-
-
-        <li id="logoutBtn"><a href="index.html">Logout</a></li>
-      </ul>
-    </aside>
-
+  
 
 
     <!-- Main Content -->
@@ -269,6 +246,8 @@ if (window.location.pathname.includes('admin') && user.role !== 'admin') {
       testimonials: ['testimonialsSection'],
       winners: ['winnersSection'],
       getLatestPosts: ['getLatestPostsSection']
+      
+
     };
   
     function showSection(keys) {
@@ -358,7 +337,7 @@ if (window.location.pathname.includes('admin') && user.role !== 'admin') {
     let users = []; 
    async function fetchUsers() {
   try {
-    const response = await fetch('http://localhost:5000/api/admin/users', {
+    const response = await fetch('https://pch-z6ny.onrender.com/api/admin/getUser', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
@@ -412,7 +391,7 @@ function renderUsers(users) {
 
 function deleteUser(index) {
   const user = users[index]; // use global users
-  fetch(`http://localhost:5000/api/admin/delete-user/${user._id}`, {
+  fetch(`http:https://pch-z6ny.onrender.com/api/admin/delete-user/${user._id}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -447,7 +426,7 @@ document.getElementById('addPostForm').addEventListener('submit', function(e) {
   formData.append("ctaLink", document.getElementById("ctaLink").value);
   formData.append("image", document.getElementById("image").files[0]);
 
-  fetch('/api/admin/posts', {
+  fetch('https://pch-z6ny.onrender.com/api/admin/heropost', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -478,7 +457,7 @@ document.getElementById('addSweepstakeForm').addEventListener('submit', function
   formData.append("sweepstakeStakeCount", document.getElementById("sweepstakeStakeCount").value);
   formData.append("sweepstakeImage", document.getElementById("sweepstakeImage").files[0]);
 
-  fetch('/api/admin/sweepstakes', {
+  fetch('https://pch-z6ny.onrender.com/api/admin/sweepstakes', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -499,7 +478,7 @@ document.getElementById('addSweepstakeForm').addEventListener('submit', function
 
 
 function fetchLatestAdminPost() {
-  fetch('/api/admin/posts/latest', {
+  fetch('https://pch-z6ny.onrender.com/api/admin/post/latest-post', {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -529,7 +508,7 @@ function fetchLatestAdminPost() {
   function viewUser(index) {
   const user = users[index]; 
 
-  fetch(`http://localhost:5000/api/admin/users/${user._id}`, {
+  fetch(`https://pch-z6ny.onrender.com/api/admin/search-users/${user._id}`, {
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
@@ -603,7 +582,7 @@ document.getElementById("emailForm").addEventListener("submit", function (e) {
   const message = document.getElementById("emailMessage").value;
 
   // TODO: Send to backend API
-  fetch('/api/send-email', {
+  fetch('https://pch-z6ny.onrender.com/api/send-email', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -670,7 +649,7 @@ formData.append("image", image);
 
 
     try {
-      const response = await fetch("http://localhost:5000/api/posts/create-post", {
+      const response = await fetch("https://pch-z6ny.onrender.com/api/admin/heropost", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -747,7 +726,7 @@ formData.append("image", image);
       return;
     }
 
-    const response = await fetch('http://localhost:5000/api/posts/latest-post', {
+    const response = await fetch('https://pch-z6ny.onrender.com/api/posts/latest-post', {
       method: 'GET', // Ensure the correct HTTP method is used
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -772,7 +751,7 @@ postContainer.innerHTML = `
   <p><strong>${data.subtitle}</strong></p>
   <a href="${data.ctaLink}" class="cta-button">${data.ctaText}</a>
   <p><em>Draw Time: ${new Date(data.drawTime).toLocaleString()}</em></p>
-  <img src="http://localhost:5000/${imagePath}" style="max-width:100%; border-radius: 8px;" />
+  <img src="https://pch-z6ny.onrender.com/${imagePath}" style="max-width:100%; border-radius: 8px;" />
 `;
 
 showSection(sections.getLatestPosts); // Make sure to show the section after render
