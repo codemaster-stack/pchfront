@@ -433,6 +433,8 @@ document.getElementById('addPostForm').addEventListener('submit', function(e) {
   formData.append("subtitle", document.getElementById("subtitle").value);
   formData.append("ctaText", document.getElementById("ctaText").value);
   formData.append("ctaLink", document.getElementById("ctaLink").value);
+  formData.append("amount", document.querySelector('input[name="stakeAmount"]').value);
+  formData.append("maxStakes", document.querySelector('input[name="maxStakes"]').value);
   formData.append("image", document.getElementById("image").files[0]);
 
   fetch('https://pch-z6ny.onrender.com/api/admin/heropost', {
