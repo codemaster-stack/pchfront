@@ -519,7 +519,7 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
       }
       //  heroImgTag.src = imageUrl;
       //  heroImgTag.alt = post.title || "Hero Image";
-      heroOverlay.style.backgroundImage = `url(${imageUrl})`; // USE CORRECTED URL
+      document.querySelector('.hero').style.backgroundImage = `url(${imageUrl})`;// USE CORRECTED URL
       heroOverlay.style.backgroundSize = 'cover'; // Optional: make it cover nicely
       heroOverlay.style.backgroundPosition = 'center'; // Optional: center image
     } else {
