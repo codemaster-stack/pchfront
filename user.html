@@ -506,7 +506,8 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     heroCta.innerText = post.ctaText || "Loading...";
     heroCta.href = post.ctaLink || "#";
 
-    const drawTime = new Date(post.drawTime);
+    const drawTime = new Date(post.drawDeadline);
+
     startCountdown(drawTime);
 
     const heroOverlay = document.getElementById('heroOverlay');
