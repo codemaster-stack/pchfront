@@ -510,8 +510,8 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     startCountdown(drawTime);
 
     const heroOverlay = document.getElementById('heroOverlay');
-    if (post.imageUrl) {
-      let imageUrl = post.imageUrl.replace(/\\/g, '/'); // Fix backslashes
+    if (post.heroImage) {
+  let imageUrl = post.heroImage.replace(/\\/g, '/'); // Fix backslashes
       if (!imageUrl.startsWith('http')) {
         imageUrl = `https://pch-z6ny.onrender.com/${imageUrl}`; // Prepend domain
       }
