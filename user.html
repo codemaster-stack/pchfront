@@ -361,7 +361,7 @@ fetchNotifications();
   <section class="hero">   
   <div class="hero-overlay" id="heroOverlay">
     <div class="hero-content">
-      <img id="heroImage" src="" alt="Hero Image" style="width: 100%; height: auto; border-radius: 8px;" />
+      <!-- <img id="heroImage" src="" alt="Hero Image" style="width: 100%; height: auto; border-radius: 8px;" /> -->
       
       <h1 id="heroTitle">Loading...</h1>
       <p id="heroSubtitle">Please wait</p>
@@ -510,12 +510,15 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
 
     startCountdown(drawTime);
 
+   document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
     const heroOverlay = document.getElementById('heroOverlay');
     if (post.heroImage) {
   let imageUrl = post.heroImage.replace(/\\/g, '/'); // Fix backslashes
       if (!imageUrl.startsWith('http')) {
         imageUrl = `https://pch-z6ny.onrender.com/${imageUrl}`; // Prepend domain
       }
+      //  heroImgTag.src = imageUrl;
+      //  heroImgTag.alt = post.title || "Hero Image";
       heroOverlay.style.backgroundImage = `url(${imageUrl})`; // USE CORRECTED URL
       heroOverlay.style.backgroundSize = 'cover'; // Optional: make it cover nicely
       heroOverlay.style.backgroundPosition = 'center'; // Optional: center image
