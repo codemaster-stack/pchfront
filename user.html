@@ -827,7 +827,7 @@ window.onload = async function () {
   const adsContainer = document.getElementById('adsContainer');
 
   try {
-    const response = await fetch('https://pch-z6ny.onrender.com/api/admin/getUser');
+    const response = await fetch('https://pch-z6ny.onrender.com/api/admin/allAdv');
     const data = await response.json();
 
     if (Array.isArray(data.ads)) {
