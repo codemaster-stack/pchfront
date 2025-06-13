@@ -627,15 +627,15 @@ window.onload = function () {
 <div class="comment-ticker"> 
   <div class="ticker-content" id="ticker-content">
     <div class="comment">
-      <img src="https://via.placeholder.com/30" alt="User" />
+      <img src="https://placehold.co/30*30" alt="User" />
       <span>🎉 Aisha from Lagos just won ₦50,000!</span>
     </div>
     <div class="comment">
-      <img src="https://via.placeholder.com/30" alt="User" />
+      <img src="https://placehold.co/30*30" alt="User" />
       <span>💰 Musa from Abuja just earned 500 points!</span>
     </div>
     <div class="comment">
-      <img src="https://via.placeholder.com/30" alt="User" />
+      <img src="https://placehold.co/30*30" alt="User" />
       <span>🏆 Grace from Enugu won a free entry!</span>
     </div>
   </div>
@@ -992,87 +992,98 @@ background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:
   </footer>
   
   
-  
+  <img id="testimonial-img" />
+<p id="testimonial-text"></p>
+<p id="testimonial-name"></p>
+<div id="greeting"></div>
+<button id="sweepstakeBtn">Enter</button>
+
 
   <script>
 
-    
-  
+  const testimonials = [
+  {
+    image: "images/winner1.jpg",
+    text: "\"I couldn't believe it! I entered just once and won $5,000. Thank you!\"",
+    name: "- Sarah M., New York"
+  },
+  {
+    image: "images/winner2.jpg",
+    text: "\"This sweepstakes changed my life. I used the prize to start my dream business.\"",
+    name: "- James K., Texas"
+  },
+  {
+    image: "images/winner3.jpg",
+    text: "\"I never thought I’d win. The money helped pay my son’s college tuition!\"",
+    name: "- Amanda R., Florida"
+  },
+  {
+    image: "images/winner4.jpg",
+    text: "\"So grateful for this opportunity! The support team was amazing too.\"",
+    name: "- Emmanuel A., Lagos"
+  }
+];
 
-    const testimonials = [
-    {
-      image: "images/winner1.jpg",
-      text: "\"I couldn't believe it! I entered just once and won $5,000. Thank you!\"",
-      name: "- Sarah M., New York"
-    },
-    {
-      image: "images/winner2.jpg",
-      text: "\"This sweepstakes changed my life. I used the prize to start my dream business.\"",
-      name: "- James K., Texas"
-    },
-    {
-      image: "images/winner3.jpg",
-      text: "\"I never thought I’d win. The money helped pay my son’s college tuition!\"",
-      name: "- Amanda R., Florida"
-    },
-    {
-      image: "images/winner4.jpg",
-      text: "\"So grateful for this opportunity! The support team was amazing too.\"",
-      name: "- Emmanuel A., Lagos"
-    }
-  ];
+let index = 0;
 
-  let index = 0;
+function showTestimonial() {
+  const imgEl = document.getElementById("testimonial-img");
+  const textEl = document.getElementById("testimonial-text");
+  const nameEl = document.getElementById("testimonial-name");
 
-  function showTestimonial() {
-    const imgEl = document.getElementById("testimonial-img");
-    const textEl = document.getElementById("testimonial-text");
-    const nameEl = document.getElementById("testimonial-name");
-
-    const current = testimonials[index];
-    imgEl.src = current.image;
-    textEl.textContent = current.text;
-    nameEl.textContent = current.name;
-
-    index = (index + 1) % testimonials.length;
+  if (!imgEl || !textEl || !nameEl) {
+    console.warn("Testimonial elements not found in DOM.");
+    return;
   }
 
-  // Show the first testimonial on load
+  const current = testimonials[index];
+  imgEl.src = current.image;
+  textEl.textContent = current.text;
+  nameEl.textContent = current.name;
+
+  index = (index + 1) % testimonials.length;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Show the first testimonial when page loads
   showTestimonial();
 
-  // Change testimonial every 1 hour (3600000 milliseconds)
+  // Change testimonial every 1 hour
   setInterval(showTestimonial, 3600000);
 
+  // Greeting message
+  const userName = localStorage.getItem("userName") || "Guest";
+  const now = new Date();
+  const hour = now.getHours();
+  let timeOfDay = "Good evening";
 
-  window.onload = function () {
-    const userName = localStorage.getItem("userName") || "Guest";
+  if (hour < 12) {
+    timeOfDay = "Good morning";
+  } else if (hour < 18) {
+    timeOfDay = "Good afternoon";
+  }
 
-    const now = new Date();
-    const hour = now.getHours();
-    let timeOfDay;
+  const message = `${timeOfDay}, ${userName}! Welcome back to our sweepstakes site.`;
 
-    if (hour < 12) {
-      timeOfDay = "Good morning";
-    } else if (hour < 18) {
-      timeOfDay = "Good afternoon";
-    } else {
-      timeOfDay = "Good evening";
-    }
-
-    const message = `${timeOfDay}, ${userName}!  Welcome back to our sweepstakes site. `;
-
-    const greetingBox = document.getElementById("greeting");
+  const greetingBox = document.getElementById("greeting");
+  if (greetingBox) {
     greetingBox.textContent = message;
     greetingBox.style.display = "block";
 
     setTimeout(() => {
       greetingBox.style.display = "none";
     }, 6000);
-  };
+  }
 
-  document.getElementById('sweepstakeBtn').addEventListener('click', () => {
-  window.location.href = 'sweepstaks.html';
+  // Sweepstake button navigation
+  const btn = document.getElementById('sweepstakeBtn');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      window.location.href = 'sweepstaks.html';
+    });
+  }
 });
+
 
 
 
