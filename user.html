@@ -495,7 +495,7 @@ function startCountdown(drawTime) {
   document.addEventListener("DOMContentLoaded", async () => {
     try {
       // STEP 1: Fetch the hero post
-      const res = await fetch("https://pch-z6ny.onrender.com/api/user/coment/");
+      const res = await fetch("https://pch-z6ny.onrender.com/api/user/comment/");
       const post = await res.json();
       currentPostId = post._id;
 
