@@ -482,69 +482,91 @@ function startCountdown(drawTime) {
   }, 1000);
 }
 
-// // Fetch when page loads
-// window.onload = function () {
-//   fetchgetActivePost();
-// };
+// Fetch when page loads
+window.onload = function () {
+  fetchgetActivePost();
+};
 
 
 
 
   // let currentPostId = ""; // Set after fetching the hero post
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      // STEP 1: Fetch the hero post
-      const res = await fetch("https://pch-z6ny.onrender.com/api/user/comments");
-      const post = await res.json();
-      currentPostId = post._id;
+  
+  document.addEventListener("DOMContentLoaded", () => {
+    const commentForm = document.getElementById("commentForm");
+    const commentInput = document.getElementById("commentInput");
+    const commentsList = document.getElementById("commentsList");
 
-      // Fill hero content
-      document.getElementById("heroTitle").textContent = post.title;
-      document.getElementById("heroSubtitle").textContent = post.subtitle;
-      document.getElementById("heroCta").textContent = post.ctaText;
-      document.getElementById("heroCta").href = `/stake/${post._id}`;
-      
-      // Fetch comments for the post
-      loadComments();
+    // Replace this with the actual post ID and type from your post fetch logic
+    const currentPostId = "YOUR_HERO_POST_ID"; // dynamically replace with real ID
+    const postType = "HeroPost";
 
-    } catch (err) {
-      console.error("Hero post load error", err);
+    commentForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const comment = commentInput.value.trim();
+      if (!comment) return;
+
+      try {
+        const res = await fetch("https://pch-z6ny.onrender.com/api/user/comment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}` // if protected route
+          },
+          body: JSON.stringify({ comment, postId: currentPostId, postType })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          commentInput.value = "";
+          loadComments(); // reload comments
+        } else {
+          alert(data.message || "Failed to post comment.");
+        }
+      } catch (err) {
+        console.error("Comment submit error:", err);
+        alert("An error occurred while submitting the comment.");
+      }
+    });
+
+    // Load comments
+    async function loadComments() {
+      try {
+        const res = await fetch("https://pch-z6ny.onrender.com/api/user/comments?postId=" + currentPostId);
+        const comments = await res.json();
+
+        commentsList.innerHTML = ""; // clear old
+        comments.forEach(c => {
+          const div = document.createElement("div");
+          div.className = "comment";
+          div.textContent = c.comment; // adjust as needed
+          commentsList.appendChild(div);
+        });
+
+      } catch (err) {
+        console.error("Failed to load comments:", err);
+      }
     }
+
+    // Initial call
+    loadComments();
   });
 
-  // Load existing comments
-  async function loadComments() {
-    try {
-      const res = await fetch(`https://pch-z6ny.onrender.com/api/hero-posts/${currentPostId}/comments`);
-      const comments = await res.json();
 
-      const list = document.getElementById("commentsList");
-      list.innerHTML = ""; // Clear previous
+//   window.onload = function () {
+//   fetchgetActivePost().then(() => {
+//     if (currentPostId) {
+//       loadComments();
+//     }
+//     if (!currentPostId) {
+//   console.error("Cannot load/post comments. No active post ID.");
+//   return;
+// }
 
-      comments.forEach(c => {
-        const el = document.createElement("div");
-        el.classList.add("comment");
-        el.innerHTML = `<strong>${c.name}</strong><p>${c.comment}</p>`;
-        list.appendChild(el);
-      });
-    } catch (err) {
-      console.error("Comment load error", err);
-    }
-  }
-
-  window.onload = function () {
-  fetchgetActivePost().then(() => {
-    if (currentPostId) {
-      loadComments();
-    }
-    if (!currentPostId) {
-  console.error("Cannot load/post comments. No active post ID.");
-  return;
-}
-
-  });
-};
+//   });
+// };
 
 
 
@@ -586,7 +608,7 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
 
 
 
-<script>
+<!-- <script>
 
 
   // Handle comment submission
@@ -615,7 +637,7 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     }
   });
 </script>
-
+ -->
 
 
  
@@ -670,7 +692,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const ticker = document.getElementById("ticker-content");
 
   try {
-    const res = await fetch("https://pch-z6ny.onrender.com/api/post/comments");
+    const res = await fetch("https://pch-z6ny.onrender.com/api/post/comment");
     const data = await res.json();
 
     if (!Array.isArray(data) || data.length === 0) {
@@ -678,7 +700,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Clear any existing content
     ticker.innerHTML = "";
 
     data.forEach(comment => {
@@ -695,6 +716,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     ticker.innerHTML = "<div class='comment'>Error loading comments</div>";
   }
 });
+
 </script>
 
 

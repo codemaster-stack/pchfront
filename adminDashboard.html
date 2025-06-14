@@ -433,7 +433,8 @@ function deleteUser(index) {
 
 
 
-document.getElementById('addPostForm').addEventListener('submit', function(e) {
+
+document.getElementById("addPostForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const formData = new FormData();
@@ -446,22 +447,29 @@ document.getElementById('addPostForm').addEventListener('submit', function(e) {
   formData.append("drawTime", document.getElementById("drawTime").value);
   formData.append("image", document.getElementById("image").files[0]);
 
-  fetch('https://pch-z6ny.onrender.com/api/admin/heropost', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
-    },
-    body: formData
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      alert("Post added successfully!");
-      // Optionally, update the UI or clear the form
+  try {
+    const response = await fetch("https://pch-z6ny.onrender.com/api/admin/heropost", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      alert("Post created successfully!");
+      document.getElementById("addPostForm").reset();
+    } else {
+      alert(data.message || "Error creating post.");
     }
-  })
-  .catch(err => console.log("Error adding post: ", err));
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Failed to create post.");
+  }
 });
+
+
 
 
 
@@ -646,48 +654,48 @@ document.getElementById('logoutBtn').addEventListener('click', function () {
 
   // Add Post Form Submission
 
-  document.getElementById("addPostForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
+//   document.getElementById("addPostForm").addEventListener("submit", async function (e) {
+//     e.preventDefault();
 
-    // Collect values
-const title = document.getElementById("title").value;
-const subtitle = document.getElementById("subtitle").value;
-const ctaText = document.getElementById("ctaText").value;
-const ctaLink = document.getElementById("ctaLink").value;
-const drawTime = document.getElementById("drawTime").value;
-const expectedStakeCount = document.getElementById("expectedStakeCount").value;
-const image = document.getElementById("image").files[0];
+//     // Collect values
+// const title = document.getElementById("title").value;
+// const subtitle = document.getElementById("subtitle").value;
+// const ctaText = document.getElementById("ctaText").value;
+// const ctaLink = document.getElementById("ctaLink").value;
+// const drawTime = document.getElementById("drawTime").value;
+// const expectedStakeCount = document.getElementById("expectedStakeCount").value;
+// const image = document.getElementById("image").files[0];
 
-const formData = new FormData();
-formData.append("title", title);
-formData.append("subtitle", subtitle);
-formData.append("ctaText", ctaText);
-formData.append("ctaLink", ctaLink);
-formData.append("drawTime", drawTime);
-formData.append("expectedStakeCount", expectedStakeCount);
-formData.append("image", image);
+// const formData = new FormData();
+// formData.append("title", title);
+// formData.append("subtitle", subtitle);
+// formData.append("ctaText", ctaText);
+// formData.append("ctaLink", ctaLink);
+// formData.append("drawTime", drawTime);
+// formData.append("expectedStakeCount", expectedStakeCount);
+// formData.append("image", image);
 
 
-    try {
-      const response = await fetch("https://pch-z6ny.onrender.com/api/admin/heropost", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
-        },
-        body: formData,
-      });
+//     try {
+//       const response = await fetch("https://pch-z6ny.onrender.com/api/admin/heropost", {
+//         method: "POST",
+//         headers: {
+//           "Authorization": `Bearer ${localStorage.getItem("token")}`
+//         },
+//         body: formData,
+//       });
 
-      const data = await response.json();
-      if (response.ok) {
-        alert("Post created successfully!");
-      } else {
-        alert(data.message || "Error creating post.");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to create post.");
-    }
-  });
+//       const data = await response.json();
+//       if (response.ok) {
+//         alert("Post created successfully!");
+//       } else {
+//         alert(data.message || "Error creating post.");
+//       }
+//     } catch (error) {
+//       console.error("Error:", error);
+//       alert("Failed to create post.");
+//     }
+//   });
 
 
 
