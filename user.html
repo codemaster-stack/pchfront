@@ -456,12 +456,13 @@ let currentPostId = ""; // Set after fetching the hero post
   }
 }
 
-window.onload = function () {
-  fetchgetActivePost();
-};
-
 
  document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOMContentLoaded triggered — fetching active post...");
+
+
+  fetchgetActivePost();
+
     const commentForm = document.getElementById("commentForm");
     const commentInput = document.getElementById("commentInput");
     const commentsList = document.getElementById("commentsList");
