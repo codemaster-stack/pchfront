@@ -79,7 +79,7 @@
 
 
   .hero {
-    background-image: url('images/pch\ bana.jpg'); /* Replace with your own image if you have one */
+    /* background-image: url('images/pch\ bana.jpg'); /* Replace with your own image if you have one */
     background-size: cover;
     background-position: center;
     height: 80vh;
