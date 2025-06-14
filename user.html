@@ -421,7 +421,7 @@ let currentPostId = ""; // Set after fetching the hero post
     }
 
     const post = data.post;
-    currentPostId = post._id; // ✅ Set this here AFTER fetching `data`
+    currentPostId = post._id; //  Set this here AFTER fetching `data`
 
     console.log('Latest post fetched:', post);
 
@@ -451,54 +451,24 @@ let currentPostId = ""; // Set after fetching the hero post
     } else {
       console.error("No image URL found in the post data");
     }
-
   } catch (error) {
     console.error('Error fetching latest post:', error);
   }
 }
 
-
-function startCountdown(drawTime) {
-  const countdownDate = drawTime.getTime();
-  const timerElement = document.getElementById("timer");
-
-  const x = setInterval(function () {
-    const now = new Date().getTime();
-    const distance = countdownDate - now;
-
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
-
-    if (distance < 0) {
-      clearInterval(x);
-      timerElement.innerHTML = "00h 00m 00s";
-    }
-  }, 1000);
-}
-
-// Fetch when page loads
 window.onload = function () {
   fetchgetActivePost();
 };
 
 
-
-
-  // let currentPostId = ""; // Set after fetching the hero post
-
-  
-  document.addEventListener("DOMContentLoaded", () => {
+ document.addEventListener("DOMContentLoaded", () => {
     const commentForm = document.getElementById("commentForm");
     const commentInput = document.getElementById("commentInput");
     const commentsList = document.getElementById("commentsList");
 
-    // Replace this with the actual post ID and type from your post fetch logic
-    const currentPostId = "YOUR_HERO_POST_ID"; // dynamically replace with real ID
     const postType = "HeroPost";
 
+    if (commentForm) {
     commentForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const comment = commentInput.value.trim();
@@ -527,9 +497,11 @@ window.onload = function () {
         alert("An error occurred while submitting the comment.");
       }
     });
+    }
+  });
 
-    // Load comments
-    async function loadComments() {
+
+     async function loadComments() {
       try {
         const res = await fetch("https://pch-z6ny.onrender.com/api/user/comments?postId=" + currentPostId);
         const comments = await res.json();
@@ -547,9 +519,45 @@ window.onload = function () {
       }
     }
 
-    // Initial call
-    loadComments();
-  });
+
+
+    
+ 
+
+function startCountdown(drawTime) {
+  const countdownDate = drawTime.getTime();
+  const timerElement = document.getElementById("timer");
+
+  const x = setInterval(function () {
+    const now = new Date().getTime();
+    const distance = countdownDate - now;
+
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+
+    if (distance < 0) {
+      clearInterval(x);
+      timerElement.innerHTML = "00h 00m 00s";
+    }
+  }, 1000);
+}
+
+
+
+
+
+
+
+  // let currentPostId = ""; // Set after fetching the hero post
+
+  
+ 
+
+    // Load comments
+   
 
 
 //   window.onload = function () {
