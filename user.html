@@ -439,6 +439,8 @@ let currentPostId = ""; // Set after fetching the hero post
 
     const heroOverlay = document.getElementById('heroOverlay');
     if (post.heroImage) {
+      console.log("Image URL:", imageUrl);
+
       let imageUrl = post.heroImage.replace(/\\/g, '/');
       if (!imageUrl.startsWith('http')) {
         imageUrl = `https://pch-z6ny.onrender.com/${imageUrl}`;
