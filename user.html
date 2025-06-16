@@ -438,21 +438,20 @@ let currentPostId = ""; // Set after fetching the hero post
     document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
 
     const heroOverlay = document.getElementById('heroOverlay');
-    if (post.heroImage) {
-      console.log("Image URL:", imageUrl);
+   if (post.heroImage) {
+  let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
+console.log("Raw heroImage from DB:", post.heroImage);
 
-      let imageUrl = post.heroImage.replace(/\\/g, '/');
-      if (!imageUrl.startsWith('http')) {
-        imageUrl = `https://pch-z6ny.onrender.com/${imageUrl}`;
-      }
+  console.log("Final hero image URL:", imageUrl);
 
-      const hero = document.querySelector('.hero');
-      hero.style.backgroundImage = `url(${imageUrl})`;
-      hero.style.backgroundSize = 'cover';
-      hero.style.backgroundPosition = 'center';
-    } else {
-      console.error("No image URL found in the post data");
-    }
+  const hero = document.querySelector('.hero');
+  hero.style.backgroundImage = `url(${imageUrl})`;
+  hero.style.backgroundSize = 'cover';
+  hero.style.backgroundPosition = 'center';
+} else {
+  console.error("No image URL found in the post data");
+}
+
   } catch (error) {
     console.error('Error fetching latest post:', error);
   }
