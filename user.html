@@ -673,16 +673,32 @@ document.querySelectorAll(".emoji-btn").forEach((btn) => {
 
 
 // Function to share the hero post
-
 function shareHeroPost() {
   const title = document.getElementById('heroTitle')?.innerText || "Check this out!";
   const subtitle = document.getElementById('heroSubtitle')?.innerText || "";
-  const shareUrl = `https://pch-z6ny.onrender.com/api/user/share/${currentPostId}`; //  Use backend route
+  const shareUrl = `https://pch-z6ny.onrender.com/user/share/${currentPostId}`; // ✅ updated path
 
   const message = `${title}\n\n${subtitle}\n\n👉 ${shareUrl}`;
   const encodedMessage = encodeURIComponent(message);
   const encodedUrl = encodeURIComponent(shareUrl);
 
+  // Optional: Track share
+  const token = localStorage.getItem('token');
+  if (token) {
+    fetch('https://pch-z6ny.onrender.com/api/user/sharetrack', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        postId: currentPostId,
+        postType: 'hero'
+      })
+    }).catch(err => console.warn("Share tracking failed:", err));
+  }
+
+  // Share
   if (navigator.share) {
     navigator.share({
       title,
