@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Viewing Post...</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .post-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    #postImage {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    h1 {
+      font-size: 24px;
+      color: #333;
+    }
+    p {
+      font-size: 16px;
+      color: #555;
+    }
+    .back-btn {
+      margin-top: 20px;
+      display: inline-block;
+      text-decoration: none;
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+    .back-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="post-container">
+    <img id="postImage" src="" alt="Post Image" />
+    <h1 id="postTitle">Loading title...</h1>
+    <p id="postSubtitle">Loading description...</p>
+    <a href="/" class="back-btn">← Go Back Home</a>
+  </div>
+
+  <script>
+    const postId = window.location.pathname.split("/").pop();
+    fetch(`https://pch-z6ny.onrender.com/api/posts/${postId}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Post not found");
+        return res.json();
+      })
+      .then(data => {
+        document.getElementById("postTitle").innerText = data.title || "No Title";
+        document.getElementById("postSubtitle").innerText = data.subtitle || "No Description";
+        document.getElementById("postImage").src = data.imageUrl || "https://via.placeholder.com/600x300?text=No+Image";
+        document.title = data.title || "Shared Post";
+      })
+      .catch(err => {
+        document.getElementById("postTitle").innerText = "Post not found.";
+        document.getElementById("postSubtitle").innerText = "This shared post is invalid or no longer available.";
+        document.getElementById("postImage").style.display = "none";
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
