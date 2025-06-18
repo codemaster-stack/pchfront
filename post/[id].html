@@ -63,8 +63,11 @@
   </div>
 
   <script>
-    const postId = window.location.pathname.split("/").pop();
-    fetch(`https://pch-z6ny.onrender.com/api/posts/${postId}`)
+   const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('postId');
+
+    fetch(`https://pch-z6ny.onrender.com/api/user/posts/${postId}`)
+
       .then(res => {
         if (!res.ok) throw new Error("Post not found");
         return res.json();
