@@ -531,7 +531,7 @@ console.log("Raw heroImage from DB:", post.heroImage);
     });
     }
   });
-  
+
 
 
     async function loadComments(postId, commentsListElement) {
@@ -547,18 +547,24 @@ console.log("Raw heroImage from DB:", post.heroImage);
       return;
     }
 
-    comments.forEach(c => {
-      const div = document.createElement("div");
-      div.className = "comment";
-      div.innerHTML = `
-        <div style="padding: 10px; border-bottom: 1px solid #eee;">
-          <strong>User:</strong> ${c.userId.slice(0, 6)}...<br/>
-          <p>${c.comment}</p>
-          <small>${new Date(c.createdAt).toLocaleString()}</small>
-        </div>
-      `;
-      commentsListElement.appendChild(div);
-    });
+   // Sort comments by date descending (just in case)
+comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+// Only show the latest 5
+const latestComments = comments.slice(0, 5);
+
+latestComments.forEach(c => {
+  const div = document.createElement("div");
+  div.className = "comment";
+  div.innerHTML = `
+    <div class="meta">User: ${c.userId.slice(0, 8)}... </div>
+    <div class="text">${c.comment}</div>
+    <div class="timestamp">${new Date(c.createdAt).toLocaleString()}</div>
+  `;
+  commentsList.appendChild(div);
+});
+
+
   } catch (err) {
     console.error("Failed to load comments:", err);
     commentsListElement.innerHTML = "<p style='color:red;'>Error loading comments.</p>";
