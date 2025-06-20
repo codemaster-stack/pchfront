@@ -672,10 +672,6 @@ async function loadComments(postId, commentsListElement) {
 
 
 
-
-
-
-
 document.getElementById('heroCta').addEventListener('click', async (e) => {
   e.preventDefault(); // Stop default anchor behavior
 
@@ -751,7 +747,7 @@ function startCountdown(drawTime) {
  
 
 document.getElementById('checkWinnerBtn').addEventListener('click', async () => {
-  const postId = localStorage.getItem('selectedPostId'); // or however you're storing it
+  const postId = currentPostId; // or however you're storing it
 
   try {
     const token = localStorage.getItem('token');
