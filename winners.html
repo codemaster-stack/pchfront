@@ -71,35 +71,33 @@
   </table>
 
   <script>
-    async function fetchWinners() {
-      try {
-        const res = await fetch('/api/winner/list');
-        const winners = await res.json();
+  async function fetchWinners() {
+    try {
+      const res = await fetch('https://pch-z6ny.onrender.com/api/user/winnerlist');
+      const winners = await res.json();
 
-        const tbody = document.getElementById('winnerTableBody');
-        tbody.innerHTML = '';
+      const tbody = document.getElementById('winnerTableBody');
+      tbody.innerHTML = '';
 
-        winners.forEach(winner => {
-          const tr = document.createElement('tr');
-
-          tr.innerHTML = `
-            <td><img src="${winner.photo || 'https://via.placeholder.com/60'}" alt="Winner Photo"/></td>
-            <td>${winner.name}</td>
-            <td>${winner.phone}</td>
-            <td>${winner.address}</td>
-            <td>${winner.subtitle || '-'}</td>
-            <td>${new Date(winner.createdAt).toLocaleDateString()}</td>
-          `;
-
-          tbody.appendChild(tr);
-        });
-      } catch (err) {
-        console.error('Error loading winners:', err);
-      }
+      winners.forEach(w => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><img src="${(w.winner && w.winner.profilePicture) ? w.winner.profilePicture : 'https://via.placeholder.com/60'}" alt="Winner Photo"/></td>
+          <td>${w.winner ? w.winner.name : '-'}</td>
+          <td>${w.winner ? w.winner.phone : '-'}</td>
+          <td>${w.winner ? w.winner.address : '-'}</td>
+          <td>${w.subtitle || '-'}</td>
+          <td>${new Date(w.drawDate || w.createdAt).toLocaleDateString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error('Error loading winners:', err);
     }
+  }
 
-    fetchWinners();
-  </script>
+  fetchWinners();
+</script>
 
 </body>
 </html>
