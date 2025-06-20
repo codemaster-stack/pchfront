@@ -710,11 +710,51 @@ document.getElementById('heroCta').addEventListener('click', async (e) => {
   }
 });
 
-
-
-
-    
+ //<!-- This JavaScript should run when the user clicks “Check Draw Potential Winner!” -->
  
+
+document.getElementById('checkWinnerBtn').addEventListener('click', async () => {
+  const postId = currentPostId; // or however you're storing it
+    console.log("Using postId:", postId); // Debug log
+
+  if (!postId) {
+    alert('No post available for draw check');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/draw/${postId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+         'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await res.json();
+
+    console.log("Draw response:", data);
+
+      if (res.ok) {
+      if (data.isWinner || data.redirect === '/winner.html') {
+        localStorage.setItem('winnerData', JSON.stringify(data));
+        window.location.href = '/selectedWinner.html';
+      } else {
+        localStorage.setItem('winnerData', JSON.stringify(data));
+        window.location.href = '/betterluck.html';
+      }
+    } else {
+      alert(data.message || 'Failed to check draw results');
+    }
+
+  } catch (err) {
+    alert('Something went wrong checking winner');
+    console.error(err);
+  }
+});
+
+
 
 function startCountdown(drawTime) {
   const countdownDate = drawTime.getTime();
@@ -736,43 +776,6 @@ function startCountdown(drawTime) {
     }
   }, 1000);
 }
-
-
-
-
-
-
-
- //<!-- This JavaScript should run when the user clicks “Check Draw Potential Winner!” -->
- 
-
-document.getElementById('checkWinnerBtn').addEventListener('click', async () => {
-  const postId = currentPostId; // or however you're storing it
-
-  try {
-    const token = localStorage.getItem('token');
-    const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/draw/${postId}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const data = await res.json();
-
-    if (data.isWinner) {
-      localStorage.setItem('winnerData', JSON.stringify(data));
-      window.location.href = '/selectedWinner.html';
-    } else {
-      localStorage.setItem('winnerData', JSON.stringify(data));
-      window.location.href = '/betterluck.html';
-    }
-
-  } catch (err) {
-    alert('Something went wrong checking winner');
-    console.error(err);
-  }
-});
 
 
 
