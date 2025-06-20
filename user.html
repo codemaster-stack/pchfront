@@ -370,12 +370,25 @@ fetchNotifications();
       <p class="stake-amount">Stake Amount: ₦<span id="stakeAmount">0</span></p>
 
       <!-- 👇 Reactions -->
-      <div class="reactions">
-        <button class="emoji-btn" data-emoji="👍">👍</button>
-        <button class="emoji-btn" data-emoji="❤️">❤️</button>
-        <button class="emoji-btn" data-emoji="😂">😂</button>
-        <button class="emoji-btn" data-emoji="🔥">🔥</button>
-      </div>
+   <div class="post" data-post-id="68506c2a3be3f726f630eedd">
+  <div class="reactions">
+    <button class="emoji-btn" data-emoji="like">👍</button>
+    <span class="emoji-count" data-emoji="like">0</span>
+
+    <button class="emoji-btn" data-emoji="love">❤️</button>
+    <span class="emoji-count" data-emoji="love">0</span>
+
+    <button class="emoji-btn" data-emoji="haha">😂</button>
+    <span class="emoji-count" data-emoji="haha">0</span>
+
+    <button class="emoji-btn" data-emoji="wow">🔥</button>
+    <span class="emoji-count" data-emoji="wow">0</span>
+  </div>
+</div>
+
+
+</div>
+
 
       <!-- 👇 Share -->
       <div class="share-section">
@@ -572,76 +585,6 @@ async function loadComments(postId, commentsListElement) {
 
 
 
-//  const commentForm = document.getElementById("commentForm");
-//     const commentInput = document.getElementById("commentInput");
-//     const commentsList = document.getElementById("commentsList");
-
-//     const postType = "HeroPost";
-
-//     if (commentForm) {
-//     commentForm.addEventListener("submit", async (e) => {
-//       e.preventDefault();
-//       const comment = commentInput.value.trim();
-//       if (!comment) return;
-
-//       try {
-//         const res = await fetch("https://pch-z6ny.onrender.com/api/user/comment", {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//             "Authorization": `Bearer ${localStorage.getItem("token")}` // if protected route
-//           },
-//           body: JSON.stringify({ comment, postId: currentPostId, postType })
-//         });
-
-//         const data = await res.json();
-
-//         if (res.ok) {
-//           commentInput.value = "";
-//           loadComments(); // reload comments
-//         } else {
-//           alert(data.message || "Failed to post comment.");
-//         }
-//       } catch (err) {
-//         console.error("Comment submit error:", err);
-//         alert("An error occurred while submitting the comment.");
-//       }
-//     });
-//     }
-//   });
-  
-
-
-//     async function loadComments(postId, commentsListElement) {
-//   try {
-//     const res = await fetch(`https://pch-z6ny.onrender.com/api/user/comments?postId=${postId}`);
-//     const comments = await res.json();
-
-//     // Clear any previous content
-//     commentsListElement.innerHTML = "";
-
-//     if (!Array.isArray(comments) || comments.length === 0) {
-//       commentsListElement.innerHTML = "<p>No comments yet.</p>";
-//       return;
-//     }
-
-//     comments.forEach(c => {
-//       const div = document.createElement("div");
-//       div.className = "comment";
-//       div.innerHTML = `
-//         <div style="padding: 10px; border-bottom: 1px solid #eee;">
-//           <strong>User:</strong> ${c.userId.slice(0, 6)}...<br/>
-//           <p>${c.comment}</p>
-//           <small>${new Date(c.createdAt).toLocaleString()}</small>
-//         </div>
-//       `;
-//       commentsListElement.appendChild(div);
-//     });
-//   } catch (err) {
-//     console.error("Failed to load comments:", err);
-//     commentsListElement.innerHTML = "<p style='color:red;'>Error loading comments.</p>";
-//   }
-// }
 
 
 
@@ -749,48 +692,67 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
   }
 });
 
+
   
 // Function to handle emoji reactions
 
-document.querySelectorAll(".emoji-btn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    const emoji = btn.getAttribute("data-emoji");
+document.querySelectorAll(".post").forEach((postElement) => {
+  const postId = postElement.dataset.postId;
 
-    if (!currentPostId) {
-      alert("No post selected");
-      return;
-    }
+  postElement.querySelectorAll(".emoji-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const emoji = btn.getAttribute("data-emoji");
 
-    try {
-      const res = await fetch("https://pch-z6ny.onrender.com/api/user/react", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          postId: currentPostId,
-          emoji,
-          postType: "HeroPost"
-        }),
-      });
+      try {
+        const res = await fetch("https://pch-z6ny.onrender.com/api/user/react", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            postId,
+            emoji,
+            postType: "HeroPost",
+          }),
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (res.ok) {
-        // Optional: Show a quick popup or count update
-        alert(`You reacted with ${emoji}!`);
-      } else {
-        alert(data.message || "Reaction failed");
+        if (res.ok) {
+          updateReactionCounts(postElement, postId); // Refresh UI
+        } else {
+          alert(data.message || "Reaction failed");
+        }
+      } catch (err) {
+        console.error("Reaction error:", err);
+        alert("Error reacting to post");
       }
-    } catch (err) {
-      console.error("Reaction error:", err);
-      alert("Error reacting to post");
-    }
+    });
   });
+
+  // Load counts initially when page loads
+  updateReactionCounts(postElement, postId);
 });
 
+// Function to update reaction counts for a post
 
+async function updateReactionCounts(postElement, postId) {
+  try {
+    const res = await fetch(`https://pch-z6ny.onrender.com/api/user/HeroPost/${postId}`);
+
+    const reactionData = await res.json(); // e.g., { "👍": 2, "❤️": 3 }
+
+    const countSpans = postElement.querySelectorAll(".emoji-count");
+
+    countSpans.forEach(span => {
+      const emoji = span.getAttribute("data-emoji");
+      span.textContent = reactionData[emoji] || 0;
+    });
+  } catch (err) {
+    console.error("Failed to load reaction counts", err);
+  }
+}
 
 
 
