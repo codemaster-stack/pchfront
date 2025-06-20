@@ -369,18 +369,10 @@ fetchNotifications();
       <!-- 👇 Reactions -->
       <div class="post" data-post-id="68506c2a3be3f726f630eedd">
         <div class="reactions">
-      <button class="emoji-btn" data-emoji="like">
-      👍 <span class="emoji-count" data-emoji="like">0</span>
-     </button>
-      <button class="emoji-btn" data-emoji="love">
-     ❤️ <span class="emoji-count" data-emoji="love">0</span>
-    </button>
-      <button class="emoji-btn" data-emoji="haha">
-     😂 <span class="emoji-count" data-emoji="haha">0</span>
-      </button>
-       <button class="emoji-btn" data-emoji="wow">
-     🔥 <span class="emoji-count" data-emoji="wow">0</span>
-      </button>
+      <button class="emoji-btn" data-emoji="like">👍 <span class="emoji-count" data-emoji="like">0</span></button>
+      <button class="emoji-btn" data-emoji="love">❤️ <span class="emoji-count" data-emoji="love">0</span></button>
+      <button class="emoji-btn" data-emoji="haha">😂 <span class="emoji-count" data-emoji="haha">0</span></button>
+       <button class="emoji-btn" data-emoji="wow">🔥 <span class="emoji-count" data-emoji="wow">0</span></button>
         </div>
       </div>
 
@@ -409,7 +401,7 @@ fetchNotifications();
 
 
 <script>// Function to view comments for a post
-
+document.addEventListener('DOMContentLoaded', function() {
 
 document.querySelectorAll('.toggle-comments-btn').forEach(button => {
   button.addEventListener('click', async function () {
@@ -427,6 +419,111 @@ document.querySelectorAll('.toggle-comments-btn').forEach(button => {
     }
   });
 });
+
+
+
+
+// Function to handle emoji reactions
+
+console.log("Reaction script loaded");
+
+document.querySelectorAll(".post").forEach((postElement) => {
+  const postId = postElement.dataset.postId;
+  console.log("Found post with ID:", postId);
+  
+  if (!postId) {
+    console.error("Post element missing data-post-id:", postElement);
+    return;
+  }
+
+  postElement.querySelectorAll(".emoji-btn").forEach((btn) => {
+    console.log("Found emoji button:", btn);
+    
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault(); // Prevent any default behavior
+      console.log("Emoji button clicked!");
+      
+      const emoji = btn.getAttribute("data-emoji");
+      console.log("Emoji:", emoji, "PostId:", postId);
+
+      // Check if user is authenticated
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please log in to react to posts");
+        return;
+      }
+
+      try {
+        console.log("Sending reaction request...");
+        
+        const res = await fetch("https://pch-z6ny.onrender.com/api/user/react", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            postId,
+            emoji,
+            postType: "HeroPost",
+          }),
+        });
+
+        console.log("Response status:", res.status);
+        const data = await res.json();
+        console.log("Response data:", data);
+
+        if (res.ok) {
+          console.log("Reaction successful, updating counts...");
+          updateReactionCounts(postElement, postId);
+        } else {
+          console.error("Reaction failed:", data);
+          alert(data.error || data.message || "Reaction failed");
+        }
+      } catch (err) {
+        console.error("Reaction error:", err);
+        alert("Error reacting to post");
+      }
+    });
+  });
+
+  // Load initial counts
+  updateReactionCounts(postElement, postId);
+});
+
+// Function to update reaction counts for a post
+async function updateReactionCounts(postElement, postId) {
+  try {
+    console.log("Fetching reaction counts for post:", postId);
+    
+    const res = await fetch(`https://pch-z6ny.onrender.com/api/user/HeroPost/${postId}`);
+    console.log("Counts response status:", res.status);
+    
+    if (!res.ok) {
+      console.error("Failed to fetch reaction counts:", res.status);
+      return;
+    }
+
+    const reactionData = await res.json();
+    console.log("Reaction counts:", reactionData);
+
+    const countSpans = postElement.querySelectorAll(".emoji-count");
+    console.log("Found count spans:", countSpans.length);
+
+    countSpans.forEach(span => {
+      const emoji = span.getAttribute("data-emoji");
+      const count = reactionData[emoji] || 0;
+      span.textContent = count;
+      console.log(`Updated ${emoji} count to:`, count);
+    });
+  } catch (err) {
+    console.error("Failed to load reaction counts", err);
+  }
+}
+
+}); // End of DOMContentLoaded listener
+
+
 
 
 
@@ -534,8 +631,6 @@ document.querySelectorAll('.comment-form').forEach(form => {
   });
 });
 });
-
-
 
 
 
@@ -682,107 +777,6 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     console.error(err);
   }
 });
-
-
-  
-// Function to handle emoji reactions
-
-console.log("Reaction script loaded");
-
-document.querySelectorAll(".post").forEach((postElement) => {
-  const postId = postElement.dataset.postId;
-  console.log("Found post with ID:", postId);
-  
-  if (!postId) {
-    console.error("Post element missing data-post-id:", postElement);
-    return;
-  }
-
-  postElement.querySelectorAll(".emoji-btn").forEach((btn) => {
-    console.log("Found emoji button:", btn);
-    
-    btn.addEventListener("click", async (e) => {
-      e.preventDefault(); // Prevent any default behavior
-      console.log("Emoji button clicked!");
-      
-      const emoji = btn.getAttribute("data-emoji");
-      console.log("Emoji:", emoji, "PostId:", postId);
-
-      // Check if user is authenticated
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Please log in to react to posts");
-        return;
-      }
-
-      try {
-        console.log("Sending reaction request...");
-        
-        const res = await fetch("https://pch-z6ny.onrender.com/api/user/react", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            postId,
-            emoji,
-            postType: "HeroPost",
-          }),
-        });
-
-        console.log("Response status:", res.status);
-        const data = await res.json();
-        console.log("Response data:", data);
-
-        if (res.ok) {
-          console.log("Reaction successful, updating counts...");
-          updateReactionCounts(postElement, postId);
-        } else {
-          console.error("Reaction failed:", data);
-          alert(data.error || data.message || "Reaction failed");
-        }
-      } catch (err) {
-        console.error("Reaction error:", err);
-        alert("Error reacting to post");
-      }
-    });
-  });
-
-  // Load initial counts
-  updateReactionCounts(postElement, postId);
-});
-
-// Function to update reaction counts for a post
-async function updateReactionCounts(postElement, postId) {
-  try {
-    console.log("Fetching reaction counts for post:", postId);
-    
-    const res = await fetch(`https://pch-z6ny.onrender.com/api/user/HeroPost/${postId}`);
-    console.log("Counts response status:", res.status);
-    
-    if (!res.ok) {
-      console.error("Failed to fetch reaction counts:", res.status);
-      return;
-    }
-
-    const reactionData = await res.json();
-    console.log("Reaction counts:", reactionData);
-
-    const countSpans = postElement.querySelectorAll(".emoji-count");
-    console.log("Found count spans:", countSpans.length);
-
-    countSpans.forEach(span => {
-      const emoji = span.getAttribute("data-emoji");
-      const count = reactionData[emoji] || 0;
-      span.textContent = count;
-      console.log(`Updated ${emoji} count to:`, count);
-    });
-  } catch (err) {
-    console.error("Failed to load reaction counts", err);
-  }
-}
-
 
 
 
