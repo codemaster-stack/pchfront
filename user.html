@@ -358,58 +358,45 @@ fetchNotifications();
 
 
   <!-- Hero Section -->
-  <section class="hero">   
+ <section class="hero">   
   <div class="hero-overlay" id="heroOverlay">
     <div class="hero-content">
-      <!-- <img id="heroImage" src="" alt="Hero Image" style="width: 100%; height: auto; border-radius: 8px;" /> -->
-      
       <h1 id="heroTitle">Loading...</h1>
       <p id="heroSubtitle">Please wait</p>
       <a id="heroCta" href="#" class="btn-enter">Loading...</a>
-
       <p class="stake-amount">Stake Amount: ₦<span id="stakeAmount">0</span></p>
 
       <!-- 👇 Reactions -->
-   <div class="post" data-post-id="68506c2a3be3f726f630eedd">
-  <div class="reactions">
-    <button class="emoji-btn" data-emoji="like">👍</button>
-    <span class="emoji-count" data-emoji="like">0</span>
+      <div class="post" data-post-id="68506c2a3be3f726f630eedd">
+        <div class="reactions">
+          <button class="emoji-btn" data-emoji="like">👍</button>
+          <span class="emoji-count" data-emoji="like">0</span>
+          <button class="emoji-btn" data-emoji="love">❤️</button>
+          <span class="emoji-count" data-emoji="love">0</span>
+          <button class="emoji-btn" data-emoji="haha">😂</button>
+          <span class="emoji-count" data-emoji="haha">0</span>
+          <button class="emoji-btn" data-emoji="wow">🔥</button>
+          <span class="emoji-count" data-emoji="wow">0</span>
+        </div>
+      </div>
 
-    <button class="emoji-btn" data-emoji="love">❤️</button>
-    <span class="emoji-count" data-emoji="love">0</span>
-
-    <button class="emoji-btn" data-emoji="haha">😂</button>
-    <span class="emoji-count" data-emoji="haha">0</span>
-
-    <button class="emoji-btn" data-emoji="wow">🔥</button>
-    <span class="emoji-count" data-emoji="wow">0</span>
-  </div>
-</div>
-
-
-</div>
-
-
-      <!-- 👇 Share -->
+      <!-- ✅ Move these inside -->
       <div class="share-section">
         <button onclick="shareHeroPost()">🔗 Share</button>
       </div>
 
-      <!-- 👇 Comments -->
       <div class="post" data-post-id="68506c2a3be3f726f630eedd">
-  
-  <button class="toggle-comments-btn">👁️ View Comments</button>
+        <button class="toggle-comments-btn">👁️ View Comments</button>
+        <div class="comments-section" style="display: none;">
+          <form class="comment-form">
+            <input type="text" class="comment-input" placeholder="Write a comment..." required />
+            <button type="submit">Post</button>
+          </form>
+          <div class="comments-list"></div>
+        </div>
+      </div>
 
-  <div class="comments-section" style="display: none;">
-    <form class="comment-form">
-      <input type="text" class="comment-input" placeholder="Write a comment..." required />
-      <button type="submit">Post</button>
-    </form>
-    <div class="comments-list"></div>
-  </div>
-</div>
-
-    </div>   
+    </div> <!-- ✅ now everything is inside .hero-content -->
   </div>
 </section>
 
@@ -713,14 +700,14 @@ document.querySelectorAll(".post").forEach((postElement) => {
           body: JSON.stringify({
             postId,
             emoji,
-            postType: "HeroPost",
+            postType: "HeroPost", // Ensure this matches what backend expects
           }),
         });
 
         const data = await res.json();
 
         if (res.ok) {
-          updateReactionCounts(postElement, postId); // Refresh UI
+          updateReactionCounts(postElement, postId);
         } else {
           alert(data.message || "Reaction failed");
         }
@@ -731,7 +718,6 @@ document.querySelectorAll(".post").forEach((postElement) => {
     });
   });
 
-  // Load counts initially when page loads
   updateReactionCounts(postElement, postId);
 });
 
