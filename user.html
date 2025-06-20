@@ -384,9 +384,7 @@ fetchNotifications();
 
       <!-- 👇 Comments -->
       <div class="post" data-post-id="68506c2a3be3f726f630eedd">
-  <h3>Post Title</h3>
-  <p>Some content</p>
-
+  
   <button class="toggle-comments-btn">👁️ View Comments</button>
 
   <div class="comments-section" style="display: none;">
@@ -424,7 +422,8 @@ document.querySelectorAll('.toggle-comments-btn').forEach(button => {
       await loadComments(postId, commentsList);
     }
   });
-}); 
+});
+
 
 
 
@@ -494,43 +493,43 @@ console.log("Raw heroImage from DB:", post.heroImage);
 
   fetchgetActivePost();
 
-    const commentForm = document.getElementById("commentForm");
-    const commentInput = document.getElementById("commentInput");
-    const commentsList = document.getElementById("commentsList");
+    document.querySelectorAll('.comment-form').forEach(form => {
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    
+    const postContainer = this.closest('.post');
+    const postId = postContainer.dataset.postId;
+    const input = this.querySelector('.comment-input');
+    const comment = input.value.trim();
+    const commentsList = postContainer.querySelector('.comments-list');
+    
+    if (!comment) return;
 
-    const postType = "HeroPost";
+    try {
+      const res = await fetch("https://pch-z6ny.onrender.com/api/user/comment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ comment, postId, postType: "HeroPost" })
+      });
 
-    if (commentForm) {
-    commentForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const comment = commentInput.value.trim();
-      if (!comment) return;
+      const data = await res.json();
 
-      try {
-        const res = await fetch("https://pch-z6ny.onrender.com/api/user/comment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}` // if protected route
-          },
-          body: JSON.stringify({ comment, postId: currentPostId, postType })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          commentInput.value = "";
-          loadComments(currentPostId, commentsList); // reload comments
-        } else {
-          alert(data.message || "Failed to post comment.");
-        }
-      } catch (err) {
-        console.error("Comment submit error:", err);
-        alert("An error occurred while submitting the comment.");
+      if (res.ok) {
+        input.value = "";
+        await loadComments(postId, commentsList); // reload after new comment
+      } else {
+        alert(data.message || "Failed to post comment.");
       }
-    });
+    } catch (err) {
+      console.error("Comment submit error:", err);
+      alert("An error occurred while submitting the comment.");
     }
   });
+});
+});
 
 
 
