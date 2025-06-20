@@ -520,7 +520,7 @@ console.log("Raw heroImage from DB:", post.heroImage);
 
         if (res.ok) {
           commentInput.value = "";
-          loadComments(); // reload comments
+          loadComments(currentPostId, commentsList); // reload comments
         } else {
           alert(data.message || "Failed to post comment.");
         }
