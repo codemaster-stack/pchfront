@@ -383,17 +383,18 @@ fetchNotifications();
       </div>
 
       <!-- 👇 Comments -->
-      <!-- Toggle Button -->
-<button id="toggleCommentsBtn" onclick="toggleComments()">👁️ View Comments</button>
+      <div class="post" data-post-id="68506c2a3be3f726f630eedd">
+  <h3>Post Title</h3>
+  <p>Some content</p>
 
-<!-- Hidden Container -->
-<div id="commentsContainer" style="display: none; margin-top: 10px;">
-  <form id="commentForm">
-    <input type="text" id="commentInput" placeholder="Write a comment..." required />
-    <button type="submit">Post</button>
-  </form>
-  <div id="commentsList">
-    <!-- Comments will be dynamically inserted here -->
+  <button class="toggle-comments-btn">👁️ View Comments</button>
+
+  <div class="comments-section" style="display: none;">
+    <form class="comment-form">
+      <input type="text" class="comment-input" placeholder="Write a comment..." required />
+      <button type="submit">Post</button>
+    </form>
+    <div class="comments-list"></div>
   </div>
 </div>
 
@@ -403,30 +404,31 @@ fetchNotifications();
 
 
 
-<script>
-  let commentsVisible = false;
 
-  function toggleComments() {
-    const container = document.getElementById("commentsContainer");
-    const btn = document.getElementById("toggleCommentsBtn");
 
-    if (!commentsVisible) {
-      container.style.display = "block";
-      btn.innerText = "🔽 Hide Comments";
-      loadComments();
-    } else {
-      container.style.display = "none";
-      btn.innerText = "👁️ View Comments";
+<script>// Function to view comments for a post
+
+
+document.querySelectorAll('.toggle-comments-btn').forEach(button => {
+  button.addEventListener('click', async function () {
+    const postContainer = this.closest('.post');
+    const postId = postContainer.dataset.postId;
+    const commentsSection = postContainer.querySelector('.comments-section');
+    const commentsList = postContainer.querySelector('.comments-list');
+
+    // Toggle visibility
+    const isVisible = commentsSection.style.display === 'block';
+    commentsSection.style.display = isVisible ? 'none' : 'block';
+
+    if (!isVisible) {
+      await loadComments(postId, commentsList);
     }
-
-    commentsVisible = !commentsVisible;
-  }
-</script>
+  });
+}); 
 
 
 
-
-<script> // Hero Section comment and reaction functionality
+// Hero Section comment and reaction functionality
 
 
  // Function to fetch the latest post from the backend
@@ -529,25 +531,40 @@ console.log("Raw heroImage from DB:", post.heroImage);
     });
     }
   });
+  
 
 
-     async function loadComments() {
-      try {
-        const res = await fetch("https://pch-z6ny.onrender.com/api/user/comments?postId=" + currentPostId);
-        const comments = await res.json();
+    async function loadComments(postId, commentsListElement) {
+  try {
+    const res = await fetch(`https://pch-z6ny.onrender.com/api/user/comments?postId=${postId}`);
+    const comments = await res.json();
 
-        commentsList.innerHTML = ""; // clear old
-        comments.forEach(c => {
-          const div = document.createElement("div");
-          div.className = "comment";
-          div.textContent = c.comment; // adjust as needed
-          commentsList.appendChild(div);
-        });
+    // Clear any previous content
+    commentsListElement.innerHTML = "";
 
-      } catch (err) {
-        console.error("Failed to load comments:", err);
-      }
+    if (!Array.isArray(comments) || comments.length === 0) {
+      commentsListElement.innerHTML = "<p>No comments yet.</p>";
+      return;
     }
+
+    comments.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "comment";
+      div.innerHTML = `
+        <div style="padding: 10px; border-bottom: 1px solid #eee;">
+          <strong>User:</strong> ${c.userId.slice(0, 6)}...<br/>
+          <p>${c.comment}</p>
+          <small>${new Date(c.createdAt).toLocaleString()}</small>
+        </div>
+      `;
+      commentsListElement.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Failed to load comments:", err);
+    commentsListElement.innerHTML = "<p style='color:red;'>Error loading comments.</p>";
+  }
+}
+
 
 
 
