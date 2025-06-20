@@ -383,18 +383,46 @@ fetchNotifications();
       </div>
 
       <!-- 👇 Comments -->
-      <div class="comments-section">
-        <form id="commentForm">
-          <input type="text" id="commentInput" placeholder="Write a comment..." required />
-          <button type="submit">Post</button>
-        </form>
-        <div id="commentsList">
-          <!-- Comments will be dynamically inserted here -->
-        </div>
-      </div>
+      <!-- Toggle Button -->
+<button id="toggleCommentsBtn" onclick="toggleComments()">👁️ View Comments</button>
+
+<!-- Hidden Container -->
+<div id="commentsContainer" style="display: none; margin-top: 10px;">
+  <form id="commentForm">
+    <input type="text" id="commentInput" placeholder="Write a comment..." required />
+    <button type="submit">Post</button>
+  </form>
+  <div id="commentsList">
+    <!-- Comments will be dynamically inserted here -->
+  </div>
+</div>
+
     </div>   
   </div>
 </section>
+
+
+
+<script>
+  let commentsVisible = false;
+
+  function toggleComments() {
+    const container = document.getElementById("commentsContainer");
+    const btn = document.getElementById("toggleCommentsBtn");
+
+    if (!commentsVisible) {
+      container.style.display = "block";
+      btn.innerText = "🔽 Hide Comments";
+      loadComments();
+    } else {
+      container.style.display = "none";
+      btn.innerText = "👁️ View Comments";
+    }
+
+    commentsVisible = !commentsVisible;
+  }
+</script>
+
 
 
 
