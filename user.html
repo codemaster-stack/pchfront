@@ -752,6 +752,12 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     alert('Something went wrong checking winner');
     console.error(err);
   }
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOMContentLoaded triggered — fetching active post...");
+  fetchgetActivePost(); // This will now setup event listeners after post is loaded
+});
+
 });
 
 
