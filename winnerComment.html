@@ -74,6 +74,10 @@
     .message.success {
       color: #28a745;
     }
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -96,6 +100,9 @@
       <label for="photo">Upload Your Picture</label>
       <input type="file" id="photo" name="photo" accept="image/*" required />
 
+      <!-- Hidden field for postId -->
+      <input type="hidden" id="postId" name="postId" />
+
       <button type="submit">Submit</button>
 
       <div id="formMessage" class="message"></div>
@@ -105,6 +112,62 @@
   <script>
     const form = document.getElementById('commentForm');
     const messageDiv = document.getElementById('formMessage');
+    const postIdField = document.getElementById('postId');
+
+    // Function to get current post ID
+    async function getCurrentPostId() {
+      try {
+        const response = await fetch('https://pch-z6ny.onrender.com/api/post/active?_=' + new Date().getTime());
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch current post');
+        }
+
+        const data = await response.json();
+        if (data && data.post && data.post._id) {
+          return data.post._id;
+        }
+        
+        throw new Error('No active post found');
+      } catch (error) {
+        console.error('Error fetching current post:', error);
+        return null;
+      }
+    }
+
+    // Load current post ID when page loads
+    window.addEventListener('load', async () => {
+      // Check for authentication token
+      const token = localStorage.getItem('authToken') || 
+                    localStorage.getItem('token') || 
+                    sessionStorage.getItem('authToken') || 
+                    sessionStorage.getItem('token');
+      
+      console.log('Auth token available:', !!token);
+      if (!token) {
+        console.warn('No authentication token found. User may need to log in again.');
+        messageDiv.textContent = 'Authentication required. Please log in.';
+        messageDiv.classList.add('error');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 2000);
+        return;
+      }
+
+      // Get current post ID
+      messageDiv.textContent = 'Loading current post...';
+      const postId = await getCurrentPostId();
+      
+      if (postId) {
+        postIdField.value = postId;
+        messageDiv.textContent = '';
+        console.log('Current post ID loaded:', postId);
+      } else {
+        messageDiv.textContent = 'No active post found. Please try again later.';
+        messageDiv.classList.add('error');
+        form.classList.add('loading');
+      }
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -123,18 +186,35 @@
         messageDiv.textContent = 'Authentication required. Please log in again.';
         messageDiv.classList.add('error');
         setTimeout(() => {
-          window.location.href = '/login.html'; // Redirect to login
+          window.location.href = '/login.html';
         }, 2000);
         return;
       }
 
+      // Check if postId is available
+      if (!postIdField.value) {
+        messageDiv.textContent = 'Post ID not found. Please refresh the page and try again.';
+        messageDiv.classList.add('error');
+        return;
+      }
+
       const formData = new FormData(form);
+      
+      // Debug: Log form data
+      console.log('Submitting form with data:');
+      for (let [key, value] of formData.entries()) {
+        console.log(key, ':', value);
+      }
+
+      // Show loading state
+      form.classList.add('loading');
+      messageDiv.textContent = 'Submitting your comment...';
 
       try {
         const response = await fetch('https://pch-z6ny.onrender.com/api/post/comment', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}` // Add the auth token
+            'Authorization': `Bearer ${token}`
           },
           body: formData
         });
@@ -156,19 +236,7 @@
         console.error('Error submitting comment:', error);
         messageDiv.textContent = error.message;
         messageDiv.classList.add('error');
-      }
-    });
-
-    // Debug: Check if token exists when page loads
-    window.addEventListener('load', () => {
-      const token = localStorage.getItem('authToken') || 
-                    localStorage.getItem('token') || 
-                    sessionStorage.getItem('authToken') || 
-                    sessionStorage.getItem('token');
-      
-      console.log('Auth token available:', !!token);
-      if (!token) {
-        console.warn('No authentication token found. User may need to log in again.');
+        form.classList.remove('loading');
       }
     });
   </script>
