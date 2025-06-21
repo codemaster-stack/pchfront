@@ -660,11 +660,11 @@ async function fetchgetActivePost() {
     const checkWinnerBtn = document.getElementById('checkWinnerBtn'); // Ensure this exists in your HTML
 
     // Show/hide CTA and Draw button based on draw state
-    if (post.isDrawTime && post.drawAvailableUntil) {
+    if (post.isDrawTime && post.drawDeadline) {
       heroCta.style.display = "none";
       if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
       // Start countdown for drawAvailableUntil
-      const drawTime = new Date(post.drawAvailableUntil);
+      const drawTime = new Date(post.drawDeadline);
       startCountdown(drawTime);
     } else {
       heroCta.innerText = post.ctaText || "Stake Now";
@@ -926,11 +926,11 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     });
 
     const data = await res.json();
-
     console.log("Draw response:", data);
 
     if (res.ok) {
-      if (data.redirect === '/winner.html') {
+      // Check if user is winner using isWinner property or redirect
+      if (data.isWinner === true || data.redirect === '/selectedWinner.html') {
         localStorage.setItem('winnerData', JSON.stringify(data));
         window.location.href = '/selectedWinner.html';
       } else {
@@ -945,9 +945,7 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     alert('Something went wrong checking winner');
     console.error(err);
   }
-
 });
-
 
 
 
