@@ -664,8 +664,7 @@ async function fetchgetActivePost() {
       console.log('New post detected:', post);
       displayPost(post);
     } else {
-      console.log('Same post, checking expiration...');
-      checkPostExpiration(post);
+      console.log('Same post, nothing to update.');
     }
 
   } catch (error) {
@@ -681,7 +680,6 @@ function displayPost(post) {
     countdownInterval = null;
   }
 
-  // Hide hold on message if it was showing
   hideHoldOnMessage();
 
   document.getElementById('heroTitle').innerText = post.title || "Loading...";
@@ -690,42 +688,53 @@ function displayPost(post) {
   const heroCta = document.getElementById('heroCta');
   const checkWinnerBtn = document.getElementById('checkWinnerBtn');
 
-  // Show/hide CTA and Draw button based on draw state
-  if (post.isDrawTime && post.drawDeadline) {
-    heroCta.style.display = "none";
-    if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
-    
-    const drawTime = new Date(post.drawDeadline);
-    startCountdown(drawTime);
-  } else {
-    heroCta.innerText = post.ctaText || "Stake Now";
-    heroCta.style.display = "block";
-    if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
-  }
+  heroCta.innerText = post.ctaText || "Stake Now";
+  heroCta.style.display = "block";
+  if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
 
   document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
 
   // Set background image
   if (post.heroImage) {
     let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
-    console.log("Setting hero image:", imageUrl);
-
     const hero = document.querySelector('.hero');
     hero.style.backgroundImage = `url(${imageUrl})`;
     hero.style.backgroundSize = 'cover';
     hero.style.backgroundPosition = 'center';
   }
+
+  // Start 30-minute countdown for this post
+  startThirtyMinuteCountdown();
 }
 
-function checkPostExpiration(post) {
-  const now = new Date();
-  const deadline = new Date(post.drawDeadline);
-  
-  if (now >= deadline) {
-    console.log('Current post has expired, fetching next post...');
-    // Force fetch the next post immediately
-    setTimeout(() => fetchgetActivePost(), 1000);
+function startThirtyMinuteCountdown() {
+  const timerElement = document.getElementById("timer");
+  let timeLeft = 30 * 60; // 30 minutes in seconds
+
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
   }
+
+  countdownInterval = setInterval(function () {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+
+    timerElement.innerHTML = `${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+
+    if (timeLeft <= 0) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+      timerElement.innerHTML = "00m 00s";
+      // Mark post as expired in backend, then fetch next post
+      fetch(`https://pch-z6ny.onrender.com/api/post/${currentPostId}/expire`, {
+        method: 'PATCH'
+      }).then(() => {
+        fetchgetActivePost();
+      });
+    }
+
+    timeLeft--;
+  }, 1000);
 }
 
 function showHoldOnMessage(message = "Hold on the next stake will start in a moment") {
@@ -757,38 +766,6 @@ function showHoldOnMessage(message = "Hold on the next stake will start in a mom
 function hideHoldOnMessage() {
   const hero = document.querySelector('.hero');
   hero.style.backgroundColor = 'transparent';
-}
-
-function startCountdown(drawTime) {
-  // Clear any existing countdown
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-  }
-
-  const countdownDate = drawTime.getTime();
-  const timerElement = document.getElementById("timer");
-
-  countdownInterval = setInterval(function () {
-    const now = new Date().getTime();
-    const distance = countdownDate - now;
-
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
-
-    if (distance < 0) {
-      clearInterval(countdownInterval);
-      countdownInterval = null;
-      timerElement.innerHTML = "00h 00m 00s";
-      console.log('Countdown finished, fetching next post...');
-      // Fetch the next post after draw period ends
-      setTimeout(() => {
-        fetchgetActivePost();
-      }, 2000);
-    }
-  }, 1000);
 }
 
 function startPolling() {
