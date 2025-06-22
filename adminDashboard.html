@@ -165,6 +165,11 @@
       <label for="ctaText">CTA Text:</label>
       <input type="text" id="ctaText" name="ctaText" required />
     </div>
+
+    <div class="form-group">
+    <label for="ctaLink">CTA Link:</label>
+  <input type="text" id="ctaLink" name="ctaLink" value="#" required />
+    </div>
   
     <div class="form-group">
       <label for="stakeAmount">Amount:</label>
@@ -433,6 +438,7 @@ document.getElementById("addPostForm").addEventListener("submit", async function
   formData.append("title", document.getElementById("title").value);
   formData.append("subtitle", document.getElementById("subtitle").value);
   formData.append("ctaText", document.getElementById("ctaText").value);
+  formData.append("ctaLink", "#");
   formData.append("stakeAmount", document.getElementById("stakeAmount").value);
   formData.append("maxStakes", document.getElementById("maxStakes").value);
   formData.append("image", document.getElementById("image").files[0]);
