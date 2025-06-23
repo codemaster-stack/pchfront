@@ -21,6 +21,7 @@
         <li><a href="#" id="winnersLink">Winners</a></li>
         <li><a href="#" id="addSweepstakeLink">Add Sweepstakes</a></li>
         <li><a href="#" id="getLatestPosts">Get latest-post</a></li>
+       <li><a href="#" id="allHeroPostsLink">All Hero Posts</a></li>
 
         <li id="logoutBtn"><a href="index.html">Logout</a></li>
       </ul>
@@ -178,10 +179,7 @@
   <label for="maxStakes">maxStakes:</label>
 <input type="number" name="maxStakes" placeholder="Max Stakes" />
 </div>
-<div class="form-group">
-  <label for="drawTime">Draw Time:</label>
-  <input type="datetime-local" id="drawTime" name="drawTime" required />
-</div>
+
     <div class="form-group">
       <label for="image">Upload Image:</label>
       <input type="file" id="image" name="image" accept="image/*" required />
@@ -238,7 +236,73 @@
   </div>
 
 
+
+
+
+<!-- All Hero Posts Section -->
+<section id="allHeroPostsSection" style="display: none;">
+  <h2>All Hero Posts</h2>
+  <table id="heroPostsTable">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Max Stakes</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="heroPostsBody">
+      <!-- Posts will be loaded here -->
+    </tbody>
+  </table>
+</section>
+
+
+
   <script>
+
+
+
+
+// Sidebar link event
+document.getElementById('allHeroPostsLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  showSection(sections.allHeroPosts);
+  fetchAllHeroPosts();
+});
+
+// Fetch and render all hero posts
+async function fetchAllHeroPosts() {
+  try {
+    const response = await fetch('https://pch-z6ny.onrender.com/api/admin/heroposts', {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+    const posts = await response.json();
+    renderHeroPosts(posts);
+  } catch (err) {
+    alert("Failed to load hero posts.");
+  }
+}
+
+function renderHeroPosts(posts) {
+  const tbody = document.getElementById('heroPostsBody');
+  tbody.innerHTML = '';
+  posts.forEach(post => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${post.title}</td>
+      <td>${post.status}</td>
+      <td>${post.maxStakes}</td>
+      <td>${new Date(post.createdAt).toLocaleString()}</td>
+      <td>
+        <!-- You can add edit/delete buttons here if needed -->
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 
 
 // Protect pages by checking role
@@ -262,7 +326,8 @@ if (window.location.pathname.includes('admin') && user.role !== 'admin') {
       addSweepstake: ['addSweepstakeSection'],
       testimonials: ['testimonialsSection'],
       winners: ['winnersSection'],
-      getLatestPosts: ['getLatestPostsSection']
+      getLatestPosts: ['getLatestPostsSection'],
+      allHeroPosts: ['allHeroPostsSection']
       
 
     };
@@ -444,7 +509,6 @@ document.getElementById("addPostForm").addEventListener("submit", async function
   formData.append("ctaLink", document.getElementById("ctaLink").value);
   formData.append("stakeAmount", document.querySelector('input[name="stakeAmount"]').value);
   formData.append("maxStakes", document.querySelector('input[name="maxStakes"]').value);
-  formData.append("drawTime", document.getElementById("drawTime").value);
   formData.append("image", document.getElementById("image").files[0]);
 
 try {
@@ -720,7 +784,6 @@ document.getElementById('logoutBtn').addEventListener('click', function () {
     const subtitle = document.getElementById("subtitle").value;
     const ctaText = document.getElementById("ctaText").value;
     const ctaLink = document.getElementById("ctaLink").value;
-    const drawTime = document.getElementById("drawTime").value;
     const image = document.getElementById("image").files[0];
     const previewBox = document.getElementById("previewBox");
 
