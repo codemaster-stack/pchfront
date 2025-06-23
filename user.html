@@ -361,7 +361,7 @@ fetchNotifications();
   <section class="hero">   
   <div class="hero-overlay" id="heroOverlay">
     <div class="hero-content">
-      <img id="heroImage" src="" alt="Hero Image" style="width: 100%; height: auto; border-radius: 8px;" />
+      <!-- <img id="heroImage" src="" alt="Hero Image" style="width: 100%; height: auto; border-radius: 8px;" /> -->
       
       <h1 id="heroTitle">Loading...</h1>
       <p id="heroSubtitle">Please wait</p>
@@ -400,53 +400,185 @@ fetchNotifications();
 
 <script> // Hero Section comment and reaction functionality
 
-  let currentPostId = ""; // Set after fetching the hero post
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      // STEP 1: Fetch the hero post
-      const res = await fetch("https://pch-z6ny.onrender.com/api/user/coment/");
-      const post = await res.json();
-      currentPostId = post._id;
+ // Function to fetch the latest post from the backend
 
-      // Fill hero content
-      document.getElementById("heroTitle").textContent = post.title;
-      document.getElementById("heroSubtitle").textContent = post.subtitle;
-      document.getElementById("heroCta").textContent = post.ctaText;
-      document.getElementById("heroCta").href = `/stake/${post._id}`;
-      
-      // Fetch comments for the post
-      loadComments();
+let currentPostId = ""; // Set after fetching the hero post
 
-    } catch (err) {
-      console.error("Hero post load error", err);
+   async function fetchgetActivePost() {
+  console.log('Fetching active post...');
+  try {
+    const response = await fetch('https://pch-z6ny.onrender.com/api/post/active?_=' + new Date().getTime());
+    console.log('Post fetch request sent...');
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch latest post');
+    }
+
+    const data = await response.json();
+    if (!data || !data.post) {
+      throw new Error('No post data found');
+    }
+
+    const post = data.post;
+    currentPostId = post._id; //  Set this here AFTER fetching `data`
+
+    console.log('Latest post fetched:', post);
+
+    document.getElementById('heroTitle').innerText = post.title || "Loading...";
+    document.getElementById('heroSubtitle').innerText = post.subtitle || "Please wait";
+
+    const heroCta = document.getElementById('heroCta');
+    heroCta.innerText = post.ctaText || "Loading...";
+    heroCta.href = post.ctaLink || "#";
+
+    const drawTime = new Date(post.drawDeadline);
+    startCountdown(drawTime);
+
+    document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
+
+    const heroOverlay = document.getElementById('heroOverlay');
+   if (post.heroImage) {
+  let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
+console.log("Raw heroImage from DB:", post.heroImage);
+
+  console.log("Final hero image URL:", imageUrl);
+
+  const hero = document.querySelector('.hero');
+  hero.style.backgroundImage = `url(${imageUrl})`;
+  hero.style.backgroundSize = 'cover';
+  hero.style.backgroundPosition = 'center';
+} else {
+  console.error("No image URL found in the post data");
+}
+
+  } catch (error) {
+    console.error('Error fetching latest post:', error);
+  }
+}
+
+
+ document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOMContentLoaded triggered — fetching active post...");
+
+
+  fetchgetActivePost();
+
+    const commentForm = document.getElementById("commentForm");
+    const commentInput = document.getElementById("commentInput");
+    const commentsList = document.getElementById("commentsList");
+
+    const postType = "HeroPost";
+
+    if (commentForm) {
+    commentForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const comment = commentInput.value.trim();
+      if (!comment) return;
+
+      try {
+        const res = await fetch("https://pch-z6ny.onrender.com/api/user/comment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}` // if protected route
+          },
+          body: JSON.stringify({ comment, postId: currentPostId, postType })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          commentInput.value = "";
+          loadComments(); // reload comments
+        } else {
+          alert(data.message || "Failed to post comment.");
+        }
+      } catch (err) {
+        console.error("Comment submit error:", err);
+        alert("An error occurred while submitting the comment.");
+      }
+    });
     }
   });
 
-  // Load existing comments
-  async function loadComments() {
-    try {
-      const res = await fetch(`https://pch-z6ny.onrender.com/api/hero-posts/${currentPostId}/comments`);
-      const comments = await res.json();
 
-      const list = document.getElementById("commentsList");
-      list.innerHTML = ""; // Clear previous
+     async function loadComments() {
+      try {
+        const res = await fetch("https://pch-z6ny.onrender.com/api/user/comments?postId=" + currentPostId);
+        const comments = await res.json();
 
-      comments.forEach(c => {
-        const el = document.createElement("div");
-        el.classList.add("comment");
-        el.innerHTML = `<strong>${c.name}</strong><p>${c.comment}</p>`;
-        list.appendChild(el);
-      });
-    } catch (err) {
-      console.error("Comment load error", err);
+        commentsList.innerHTML = ""; // clear old
+        comments.forEach(c => {
+          const div = document.createElement("div");
+          div.className = "comment";
+          div.textContent = c.comment; // adjust as needed
+          commentsList.appendChild(div);
+        });
+
+      } catch (err) {
+        console.error("Failed to load comments:", err);
+      }
     }
-  }
+
+
+
+    
+ 
+
+function startCountdown(drawTime) {
+  const countdownDate = drawTime.getTime();
+  const timerElement = document.getElementById("timer");
+
+  const x = setInterval(function () {
+    const now = new Date().getTime();
+    const distance = countdownDate - now;
+
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+
+    if (distance < 0) {
+      clearInterval(x);
+      timerElement.innerHTML = "00h 00m 00s";
+    }
+  }, 1000);
+}
+
+
+
+
+
+
+
+  // let currentPostId = ""; // Set after fetching the hero post
+
+  
+ 
+
+    // Load comments
+   
+
+
+//   window.onload = function () {
+//   fetchgetActivePost().then(() => {
+//     if (currentPostId) {
+//       loadComments();
+//     }
+//     if (!currentPostId) {
+//   console.error("Cannot load/post comments. No active post ID.");
+//   return;
+// }
+
+//   });
+// };
 
 
 
  //<!-- This JavaScript should run when the user clicks “Check Draw Potential Winner!” -->
-
+ 
 
 document.getElementById('checkWinnerBtn').addEventListener('click', async () => {
   const postId = localStorage.getItem('selectedPostId'); // or however you're storing it
@@ -476,90 +608,14 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
   }
 });
 
-
-
-
   
-   // Function to fetch the latest post from the backend
-   async function fetchgetActivePost() {
-    console.log('Fetching active post...');
-  try {
-    const response = await fetch('https://pch-z6ny.onrender.com/api/post/active?_=' + new Date().getTime());
-    console.log('Post fetch request sent...');
-    if (!response.ok) {
-      throw new Error('Failed to fetch latest post');
-    }
-
-    const data = await response.json();
-    console.log(data);
-    if (!data || !data.post) {
-      throw new Error('No post data found');
-    }
-
-    const post = data.post;
-    console.log('Latest post fetched:', post);
-
-    document.getElementById('heroTitle').innerText = post.title || "Loading...";
-    document.getElementById('heroSubtitle').innerText = post.subtitle || "Please wait";
-
-    const heroCta = document.getElementById('heroCta');
-    heroCta.innerText = post.ctaText || "Loading...";
-    heroCta.href = post.ctaLink || "#";
-
-    const drawTime = new Date(post.drawTime);
-    startCountdown(drawTime);
-
-    const heroOverlay = document.getElementById('heroOverlay');
-    if (post.imageUrl) {
-      let imageUrl = post.imageUrl.replace(/\\/g, '/'); // Fix backslashes
-      if (!imageUrl.startsWith('http')) {
-        imageUrl = `https://pch-z6ny.onrender.com/${imageUrl}`; // Prepend domain
-      }
-      heroOverlay.style.backgroundImage = `url(${imageUrl})`; // USE CORRECTED URL
-      heroOverlay.style.backgroundSize = 'cover'; // Optional: make it cover nicely
-      heroOverlay.style.backgroundPosition = 'center'; // Optional: center image
-    } else {
-      console.error("No image URL found in the post data");
-    }
-
-  } catch (error) {
-    console.error('Error fetching latest post:', error);
-  }
-}
-
-function startCountdown(drawTime) {
-  const countdownDate = drawTime.getTime();
-  const timerElement = document.getElementById("timer");
-
-  const x = setInterval(function () {
-    const now = new Date().getTime();
-    const distance = countdownDate - now;
-
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
-
-    if (distance < 0) {
-      clearInterval(x);
-      timerElement.innerHTML = "00h 00m 00s";
-    }
-  }, 1000);
-}
-
-// Fetch when page loads
-window.onload = function () {
-  fetchgetActivePost();
-};
-
 
 
 </script>
 
 
 
-<script>
+<!-- <script>
 
 
   // Handle comment submission
@@ -588,7 +644,7 @@ window.onload = function () {
     }
   });
 </script>
-
+ -->
 
 
  
@@ -622,15 +678,15 @@ window.onload = function () {
 <div class="comment-ticker"> 
   <div class="ticker-content" id="ticker-content">
     <div class="comment">
-      <img src="https://via.placeholder.com/30" alt="User" />
+      <img src="https://placehold.co/30*30" alt="User" />
       <span>🎉 Aisha from Lagos just won ₦50,000!</span>
     </div>
     <div class="comment">
-      <img src="https://via.placeholder.com/30" alt="User" />
+      <img src="https://placehold.co/30*30" alt="User" />
       <span>💰 Musa from Abuja just earned 500 points!</span>
     </div>
     <div class="comment">
-      <img src="https://via.placeholder.com/30" alt="User" />
+      <img src="https://placehold.co/30*30" alt="User" />
       <span>🏆 Grace from Enugu won a free entry!</span>
     </div>
   </div>
@@ -643,7 +699,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const ticker = document.getElementById("ticker-content");
 
   try {
-    const res = await fetch("https://pch-z6ny.onrender.com/api/post/comments");
+    const res = await fetch("https://pch-z6ny.onrender.com/api/post/comment");
     const data = await res.json();
 
     if (!Array.isArray(data) || data.length === 0) {
@@ -651,7 +707,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Clear any existing content
     ticker.innerHTML = "";
 
     data.forEach(comment => {
@@ -668,6 +723,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     ticker.innerHTML = "<div class='comment'>Error loading comments</div>";
   }
 });
+
 </script>
 
 
@@ -822,7 +878,7 @@ window.onload = async function () {
   const adsContainer = document.getElementById('adsContainer');
 
   try {
-    const response = await fetch('https://pch-z6ny.onrender.com/admin/all');
+    const response = await fetch('https://pch-z6ny.onrender.com/api/admin/allAdv');
     const data = await response.json();
 
     if (Array.isArray(data.ads)) {
@@ -987,87 +1043,98 @@ background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:
   </footer>
   
   
-  
+  <img id="testimonial-img" />
+<p id="testimonial-text"></p>
+<p id="testimonial-name"></p>
+<div id="greeting"></div>
+<button id="sweepstakeBtn">Enter</button>
+
 
   <script>
 
-    
-  
+  const testimonials = [
+  {
+    image: "images/winner1.jpg",
+    text: "\"I couldn't believe it! I entered just once and won $5,000. Thank you!\"",
+    name: "- Sarah M., New York"
+  },
+  {
+    image: "images/winner2.jpg",
+    text: "\"This sweepstakes changed my life. I used the prize to start my dream business.\"",
+    name: "- James K., Texas"
+  },
+  {
+    image: "images/winner3.jpg",
+    text: "\"I never thought I’d win. The money helped pay my son’s college tuition!\"",
+    name: "- Amanda R., Florida"
+  },
+  {
+    image: "images/winner4.jpg",
+    text: "\"So grateful for this opportunity! The support team was amazing too.\"",
+    name: "- Emmanuel A., Lagos"
+  }
+];
 
-    const testimonials = [
-    {
-      image: "images/winner1.jpg",
-      text: "\"I couldn't believe it! I entered just once and won $5,000. Thank you!\"",
-      name: "- Sarah M., New York"
-    },
-    {
-      image: "images/winner2.jpg",
-      text: "\"This sweepstakes changed my life. I used the prize to start my dream business.\"",
-      name: "- James K., Texas"
-    },
-    {
-      image: "images/winner3.jpg",
-      text: "\"I never thought I’d win. The money helped pay my son’s college tuition!\"",
-      name: "- Amanda R., Florida"
-    },
-    {
-      image: "images/winner4.jpg",
-      text: "\"So grateful for this opportunity! The support team was amazing too.\"",
-      name: "- Emmanuel A., Lagos"
-    }
-  ];
+let index = 0;
 
-  let index = 0;
+function showTestimonial() {
+  const imgEl = document.getElementById("testimonial-img");
+  const textEl = document.getElementById("testimonial-text");
+  const nameEl = document.getElementById("testimonial-name");
 
-  function showTestimonial() {
-    const imgEl = document.getElementById("testimonial-img");
-    const textEl = document.getElementById("testimonial-text");
-    const nameEl = document.getElementById("testimonial-name");
-
-    const current = testimonials[index];
-    imgEl.src = current.image;
-    textEl.textContent = current.text;
-    nameEl.textContent = current.name;
-
-    index = (index + 1) % testimonials.length;
+  if (!imgEl || !textEl || !nameEl) {
+    console.warn("Testimonial elements not found in DOM.");
+    return;
   }
 
-  // Show the first testimonial on load
+  const current = testimonials[index];
+  imgEl.src = current.image;
+  textEl.textContent = current.text;
+  nameEl.textContent = current.name;
+
+  index = (index + 1) % testimonials.length;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Show the first testimonial when page loads
   showTestimonial();
 
-  // Change testimonial every 1 hour (3600000 milliseconds)
+  // Change testimonial every 1 hour
   setInterval(showTestimonial, 3600000);
 
+  // Greeting message
+  const userName = localStorage.getItem("userName") || "Guest";
+  const now = new Date();
+  const hour = now.getHours();
+  let timeOfDay = "Good evening";
 
-  window.onload = function () {
-    const userName = localStorage.getItem("userName") || "Guest";
+  if (hour < 12) {
+    timeOfDay = "Good morning";
+  } else if (hour < 18) {
+    timeOfDay = "Good afternoon";
+  }
 
-    const now = new Date();
-    const hour = now.getHours();
-    let timeOfDay;
+  const message = `${timeOfDay}, ${userName}! Welcome back to our sweepstakes site.`;
 
-    if (hour < 12) {
-      timeOfDay = "Good morning";
-    } else if (hour < 18) {
-      timeOfDay = "Good afternoon";
-    } else {
-      timeOfDay = "Good evening";
-    }
-
-    const message = `${timeOfDay}, ${userName}!  Welcome back to our sweepstakes site. `;
-
-    const greetingBox = document.getElementById("greeting");
+  const greetingBox = document.getElementById("greeting");
+  if (greetingBox) {
     greetingBox.textContent = message;
     greetingBox.style.display = "block";
 
     setTimeout(() => {
       greetingBox.style.display = "none";
     }, 6000);
-  };
+  }
 
-  document.getElementById('sweepstakeBtn').addEventListener('click', () => {
-  window.location.href = 'sweepstaks.html';
+  // Sweepstake button navigation
+  const btn = document.getElementById('sweepstakeBtn');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      window.location.href = 'sweepstaks.html';
+    });
+  }
 });
+
 
 
 
