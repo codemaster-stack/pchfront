@@ -484,7 +484,7 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
    async function fetchgetActivePost() {
     console.log('Fetching active post...');
   try {
-    const response = await fetch('https://pch-z6ny.onrender.com/api/posts/active?_=' + new Date().getTime());
+    const response = await fetch('https://pch-z6ny.onrender.com/api/post/active?_=' + new Date().getTime());
     console.log('Post fetch request sent...');
     if (!response.ok) {
       throw new Error('Failed to fetch latest post');
