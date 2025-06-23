@@ -537,19 +537,20 @@ document.getElementById('heroCta').addEventListener('click', async (e) => {
     const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/play/${currentPostId}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json' //  Always include
       }
     });
 
     const data = await res.json();
 
     if (res.ok) {
-      //  Stake successful — show confirmation popup
-      alert(` You have successfully staked for "${data.message}".\n\nCheck back to click a draw button — it could be you!\n\nThe more you play, the better your chances of winning.`);
+      //  Successful stake — show confirmation
+      alert(`You have successfully staked for "${data.message}".\n\nCheck back to click a draw button — it could be you!\n\nThe more you play, the better your chances of winning.`);
       window.location.href = data.redirect || "/user.html";
     } else {
-      //  Failed (e.g., insufficient balance)
-      alert(` ${data.message}`);
+      //  Failed stake
+      alert(data.message || "Something went wrong.");
       if (data.redirect) {
         window.location.href = data.redirect;
       }
@@ -560,6 +561,7 @@ document.getElementById('heroCta').addEventListener('click', async (e) => {
     alert("An unexpected error occurred. Please try again.");
   }
 });
+
 
 
 
