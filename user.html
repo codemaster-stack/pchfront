@@ -523,6 +523,46 @@ console.log("Raw heroImage from DB:", post.heroImage);
 
 
 
+
+document.getElementById('heroCta').addEventListener('click', async (e) => {
+  e.preventDefault(); // Stop default anchor behavior
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert("Please log in to stake.");
+    return window.location.href = "/login.html";
+  }
+
+  try {
+    const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/play/${currentPostId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      //  Stake successful — show confirmation popup
+      alert(` You have successfully staked for "${data.message}".\n\nCheck back to click a draw button — it could be you!\n\nThe more you play, the better your chances of winning.`);
+      window.location.href = data.redirect || "/user.html";
+    } else {
+      //  Failed (e.g., insufficient balance)
+      alert(` ${data.message}`);
+      if (data.redirect) {
+        window.location.href = data.redirect;
+      }
+    }
+
+  } catch (err) {
+    console.error("CTA stake error:", err);
+    alert("An unexpected error occurred. Please try again.");
+  }
+});
+
+
+
     
  
 
@@ -553,30 +593,6 @@ function startCountdown(drawTime) {
 
 
 
-  // let currentPostId = ""; // Set after fetching the hero post
-
-  
- 
-
-    // Load comments
-   
-
-
-//   window.onload = function () {
-//   fetchgetActivePost().then(() => {
-//     if (currentPostId) {
-//       loadComments();
-//     }
-//     if (!currentPostId) {
-//   console.error("Cannot load/post comments. No active post ID.");
-//   return;
-// }
-
-//   });
-// };
-
-
-
  //<!-- This JavaScript should run when the user clicks “Check Draw Potential Winner!” -->
  
 
@@ -596,7 +612,7 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
 
     if (data.isWinner) {
       localStorage.setItem('winnerData', JSON.stringify(data));
-      window.location.href = '/winner.html';
+      window.location.href = '/selectedWinner.html';
     } else {
       localStorage.setItem('winnerData', JSON.stringify(data));
       window.location.href = '/betterluck.html';
@@ -609,45 +625,95 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
 });
 
   
+// Function to handle emoji reactions
 
+document.querySelectorAll(".emoji-btn").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const emoji = btn.getAttribute("data-emoji");
 
-</script>
-
-
-
-<!-- <script>
-
-
-  // Handle comment submission
-  document.getElementById("commentForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = document.getElementById("commentName").value;
-    const comment = document.getElementById("commentText").value;
+    if (!currentPostId) {
+      alert("No post selected");
+      return;
+    }
 
     try {
-      const res = await fetch(`https://pch-z6ny.onrender.com/api/hero-posts/${currentPostId}/comments`, {
+      const res = await fetch("https://pch-z6ny.onrender.com/api/user/react", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ name, comment })
+        body: JSON.stringify({
+          postId: currentPostId,
+          emoji,
+          postType: "HeroPost"
+        }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        document.getElementById("commentForm").reset();
-        loadComments(); // reload after submit
+        // Optional: Show a quick popup or count update
+        alert(`You reacted with ${emoji}!`);
       } else {
-        alert("Failed to post comment");
+        alert(data.message || "Reaction failed");
       }
     } catch (err) {
-      console.error("Comment post error", err);
+      console.error("Reaction error:", err);
+      alert("Error reacting to post");
     }
   });
-</script>
- -->
+});
 
 
- 
+
+
+
+
+// Function to share the hero post
+
+function shareHeroPost() {
+  const title = document.getElementById('heroTitle')?.innerText || "Check this out!";
+  const subtitle = document.getElementById('heroSubtitle')?.innerText || "";
+  const shareUrl = window.location.href; // or use post.ctaLink if you prefer
+
+  const message = `${title}\n\n${subtitle}\n\n👉 ${shareUrl}`;
+  const encodedMessage = encodeURIComponent(message);
+  const encodedUrl = encodeURIComponent(shareUrl);
+
+  // Use native sharing if supported (mostly mobile)
+  if (navigator.share) {
+    navigator.share({
+      title,
+      text: subtitle,
+      url: shareUrl
+    }).catch((err) => console.error("Native share failed", err));
+  } else {
+    // Fallback for desktop: Show a popup with share options
+    const shareOptions = `
+      <div id="shareOptions" style="
+        position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%);
+        background: #fff; border: 1px solid #ccc; padding: 20px;
+        border-radius: 10px; z-index: 9999; text-align: center;
+        box-shadow: 0 0 15px rgba(0,0,0,0.2); max-width: 300px;
+      ">
+        <h3 style="margin-bottom: 10px;">Share This Post</h3>
+        <a href="https://wa.me/?text=${encodedMessage}" target="_blank">📱 WhatsApp</a><br/><br/>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" target="_blank">📘 Facebook</a><br/><br/>
+        <a href="https://twitter.com/intent/tweet?text=${encodedMessage}" target="_blank">🐦 Twitter</a><br/><br/>
+        <button onclick="document.getElementById('shareOptions')?.remove()">❌ Close</button>
+      </div>
+    `;
+
+    // Remove any existing one
+    document.getElementById('shareOptions')?.remove();
+    document.body.insertAdjacentHTML("beforeend", shareOptions);
+  }
+}
+
+
+
+ </script>
 
 
 
