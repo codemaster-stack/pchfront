@@ -676,8 +676,7 @@ document.querySelectorAll(".emoji-btn").forEach((btn) => {
 function shareHeroPost() {
   const title = document.getElementById('heroTitle')?.innerText || "Check this out!";
   const subtitle = document.getElementById('heroSubtitle')?.innerText || "";
-  const shareUrl = `https://pch-z6ny.onrender.com/user/share/${currentPostId}`; // ✅ updated path
-
+  const shareUrl = `https://pch-z6ny.onrender.com/api/user/sharepage/${currentPostId}`;
   const message = `${title}\n\n${subtitle}\n\n👉 ${shareUrl}`;
   const encodedMessage = encodeURIComponent(message);
   const encodedUrl = encodeURIComponent(shareUrl);
