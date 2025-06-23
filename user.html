@@ -572,9 +572,14 @@ async function updateReactionCounts(postElement, postId) {
 
 
 
+// Hero Section comment and reaction functionality
+
+
+ // Function to fetch the latest post from the backend
+
 // let currentPostId = ""; // Set after fetching the hero post
 
-// async function fetchgetActivePost() {
+//    async function fetchgetActivePost() {
 //   console.log('Fetching active post...');
 //   try {
 //     const response = await fetch('https://pch-z6ny.onrender.com/api/post/active?_=' + new Date().getTime());
@@ -590,7 +595,7 @@ async function updateReactionCounts(postElement, postId) {
 //     }
 
 //     const post = data.post;
-//     currentPostId = post._id;
+//     currentPostId = post._id; //  Set this here AFTER fetching `data`
 
 //     console.log('Latest post fetched:', post);
 
@@ -598,42 +603,35 @@ async function updateReactionCounts(postElement, postId) {
 //     document.getElementById('heroSubtitle').innerText = post.subtitle || "Please wait";
 
 //     const heroCta = document.getElementById('heroCta');
-//     const checkWinnerBtn = document.getElementById('checkWinnerBtn'); // Ensure this exists in your HTML
+//     heroCta.innerText = post.ctaText || "Loading...";
+//     heroCta.href = post.ctaLink || "#";
 
-//     // Show/hide CTA and Draw button based on draw state
-//     if (post.isDrawTime && post.drawDeadline) {
-//       heroCta.style.display = "none";
-//       if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
-//       // Start countdown for drawAvailableUntil
-//       const drawTime = new Date(post.drawDeadline);
-//       startCountdown(drawTime);
-//     } else {
-//       heroCta.innerText = post.ctaText || "Stake Now";
-//       heroCta.style.display = "block";
-//       if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
-//       // Optionally, clear or reset countdown here if needed
-//     }
+//     const drawTime = post.drawAvailableUntil ? new Date(post.drawAvailableUntil) : null;
+// if (drawTime) startCountdown(drawTime);
 
 //     document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
 
 //     const heroOverlay = document.getElementById('heroOverlay');
-//     if (post.heroImage) {
-//       let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
-//       console.log("Raw heroImage from DB:", post.heroImage);
-//       console.log("Final hero image URL:", imageUrl);
+//    if (post.heroImage) {
+//   let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
+// console.log("Raw heroImage from DB:", post.heroImage);
 
-//       const hero = document.querySelector('.hero');
-//       hero.style.backgroundImage = `url(${imageUrl})`;
-//
+//   console.log("Final hero image URL:", imageUrl);
 
+//   const hero = document.querySelector('.hero');
+//   hero.style.backgroundImage = `url(${imageUrl})`;
+//   hero.style.backgroundSize = 'cover';
+//   hero.style.backgroundPosition = 'center';
+// } else {
+//   console.error("No image URL found in the post data");
+// }
 
+//   } catch (error) {
+//     console.error('Error fetching latest post:', error);
+//   }
+// }
 
-
-
-
-let currentPostId = "";
-let pollInterval = null;
-let countdownInterval = null;
+let currentPostId = ""; // Set after fetching the hero post
 
 async function fetchgetActivePost() {
   console.log('Fetching active post...');
@@ -642,12 +640,6 @@ async function fetchgetActivePost() {
     console.log('Post fetch request sent...');
     
     if (!response.ok) {
-      if (response.status === 404) {
-        // No active posts available
-        const data = await response.json();
-        showHoldOnMessage(data.message);
-        return;
-      }
       throw new Error('Failed to fetch latest post');
     }
 
@@ -657,163 +649,50 @@ async function fetchgetActivePost() {
     }
 
     const post = data.post;
-    
-    // Check if this is a new post
-    if (currentPostId !== post._id) {
-      currentPostId = post._id;
-      console.log('New post detected:', post);
-      displayPost(post);
+    currentPostId = post._id;
+
+    console.log('Latest post fetched:', post);
+
+    document.getElementById('heroTitle').innerText = post.title || "Loading...";
+    document.getElementById('heroSubtitle').innerText = post.subtitle || "Please wait";
+
+    const heroCta = document.getElementById('heroCta');
+    const checkWinnerBtn = document.getElementById('checkWinnerBtn'); // Ensure this exists in your HTML
+
+    // Show/hide CTA and Draw button based on draw state
+    if (post.isDrawTime && post.drawAvailableUntil) {
+      heroCta.style.display = "none";
+      if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
+      // Start countdown for drawAvailableUntil
+      const drawTime = new Date(post.drawAvailableUntil);
+      startCountdown(drawTime);
     } else {
-      console.log('Same post, nothing to update.');
+      heroCta.innerText = post.ctaText || "Stake Now";
+      heroCta.style.display = "block";
+      if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
+      // Optionally, clear or reset countdown here if needed
+    }
+
+    document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
+
+    const heroOverlay = document.getElementById('heroOverlay');
+    if (post.heroImage) {
+      let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
+      console.log("Raw heroImage from DB:", post.heroImage);
+      console.log("Final hero image URL:", imageUrl);
+
+      const hero = document.querySelector('.hero');
+      hero.style.backgroundImage = `url(${imageUrl})`;
+      hero.style.backgroundSize = 'cover';
+      hero.style.backgroundPosition = 'center';
+    } else {
+      console.error("No image URL found in the post data");
     }
 
   } catch (error) {
     console.error('Error fetching latest post:', error);
-    // Continue polling even if there's an error
   }
 }
-
-function displayPost(post) {
-  // Clear any existing countdown
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
-  }
-
-  hideHoldOnMessage();
-
-  document.getElementById('heroTitle').innerText = post.title || "Loading...";
-  document.getElementById('heroSubtitle').innerText = post.subtitle || "Please wait";
-
-  const heroCta = document.getElementById('heroCta');
-  const checkWinnerBtn = document.getElementById('checkWinnerBtn');
-
-  heroCta.innerText = post.ctaText || "Stake Now";
-  heroCta.style.display = "block";
-  if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
-
-  document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
-
-  // Set background image
-  if (post.heroImage) {
-    let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
-    const hero = document.querySelector('.hero');
-    hero.style.backgroundImage = `url(${imageUrl})`;
-    hero.style.backgroundSize = 'cover';
-    hero.style.backgroundPosition = 'center';
-  }
-
-  // Start 30-minute countdown for this post
-  startThirtyMinuteCountdown();
-}
-
-function startThirtyMinuteCountdown() {
-  const timerElement = document.getElementById("timer");
-  let timeLeft = 30 * 60; // 30 minutes in seconds
-
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-  }
-
-  countdownInterval = setInterval(function () {
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-
-    timerElement.innerHTML = `${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
-
-    if (timeLeft <= 0) {
-      clearInterval(countdownInterval);
-      countdownInterval = null;
-      timerElement.innerHTML = "00m 00s";
-      // Mark post as expired in backend, then fetch next post
-      fetch(`https://pch-z6ny.onrender.com/api/post/${currentPostId}/expire`, {
-        method: 'PATCH'
-      }).then(() => {
-        fetchgetActivePost();
-      });
-    }
-
-    timeLeft--;
-  }, 1000);
-}
-
-function showHoldOnMessage(message = "Hold on the next stake will start in a moment") {
-  console.log('Showing hold on message:', message);
-  
-  document.getElementById('heroTitle').innerText = message;
-  document.getElementById('heroSubtitle').innerText = "New stakes coming soon...";
-  
-  const heroCta = document.getElementById('heroCta');
-  const checkWinnerBtn = document.getElementById('checkWinnerBtn');
-  
-  heroCta.style.display = "none";
-  if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
-  
-  document.getElementById('stakeAmount').innerText = "0";
-  
-  // Clear countdown
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
-  }
-  
-  // Clear background image or set a default
-  const hero = document.querySelector('.hero');
-  hero.style.backgroundImage = 'none';
-  hero.style.backgroundColor = '#f0f0f0'; // Or your preferred placeholder color
-}
-
-function hideHoldOnMessage() {
-  const hero = document.querySelector('.hero');
-  hero.style.backgroundColor = 'transparent';
-}
-
-function startPolling() {
-  // Clear any existing polling
-  if (pollInterval) {
-    clearInterval(pollInterval);
-  }
-
-  // Initial fetch
-  fetchgetActivePost();
-
-  // Poll every 30 seconds for updates
-  pollInterval = setInterval(() => {
-    fetchgetActivePost();
-  }, 30000); // 30 seconds
-
-  console.log('Polling started - checking for new posts every 30 seconds');
-}
-
-function stopPolling() {
-  if (pollInterval) {
-    clearInterval(pollInterval);
-    pollInterval = null;
-    console.log('Polling stopped');
-  }
-  
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
-  }
-}
-
-// Auto-start polling when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  startPolling();
-});
-
-// Clean up when page unloads
-window.addEventListener('beforeunload', function() {
-  stopPolling();
-});
-
-// Expose functions globally if needed
-window.startPolling = startPolling;
-window.stopPolling = stopPolling;
-window.fetchgetActivePost = fetchgetActivePost;
-
-
 
 
 
@@ -902,6 +781,43 @@ async function loadComments(postId, commentsListElement) {
 
 
 
+// document.getElementById('heroCta').addEventListener('click', async (e) => {
+//   e.preventDefault(); // Stop default anchor behavior
+
+//   const token = localStorage.getItem('token');
+//   if (!token) {
+//     alert("Please log in to stake.");
+//     return window.location.href = "/login.html";
+//   }
+
+//   try {
+//     const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/play/${currentPostId}`, {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${token}`,
+//         'Content-Type': 'application/json' //  Always include
+//       }
+//     });
+
+//     const data = await res.json();
+
+//     if (res.ok) {
+//       //  Successful stake — show confirmation
+//       alert(`You have successfully staked for "${data.message}".\n\nCheck back to click a draw button — it could be you!\n\nThe more you play, the better your chances of winning.`);
+//       window.location.href = data.redirect || "/user.html";
+//     } else {
+//       //  Failed stake
+//       alert(data.message || "Something went wrong.");
+//       if (data.redirect) {
+//         window.location.href = data.redirect;
+//       }
+//     }
+
+//   } catch (err) {
+//     console.error("CTA stake error:", err);
+//     alert("An unexpected error occurred. Please try again.");
+//   }
+// });
 
 
 // Stake CTA
@@ -945,6 +861,48 @@ document.getElementById('heroCta').addEventListener('click', async (e) => {
 
 
 
+//  //<!-- This JavaScript should run when the user clicks “Check Draw Potential Winner!” -->
+ 
+
+// document.getElementById('checkWinnerBtn').addEventListener('click', async () => {
+//   const postId = currentPostId; // or however you're storing it
+//     console.log("Using postId:", postId); // Debug log
+
+//   if (!postId) {
+//     alert('No post available for draw check');
+//     return;
+//   }
+
+//   try {
+//     const token = localStorage.getItem('token');
+//     const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/draw/${postId}`, {
+//       method: 'GET',
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//          'Content-Type': 'application/json'
+//       }
+//     });
+
+//     const data = await res.json();
+
+//     console.log("Draw response:", data);
+
+//       if (res.ok) {
+//       if (data.isWinner || data.redirect === '/winner.html') {
+//         localStorage.setItem('winnerData', JSON.stringify(data));
+//         window.location.href = '/selectedWinner.html';
+//       } else {
+//         localStorage.setItem('winnerData', JSON.stringify(data));
+//         window.location.href = '/betterluck.html';
+//       }
+//     } else {
+//       alert(data.message || 'Failed to check draw results');
+//     }
+
+//   } catch (err) {
+//     alert('Something went wrong checking winner');
+//     console.error(err);
+//   }
 
 
 // Draw/check winner button
@@ -968,11 +926,11 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     });
 
     const data = await res.json();
+
     console.log("Draw response:", data);
 
     if (res.ok) {
-      // Check if user is winner using isWinner property or redirect
-      if (data.isWinner === true || data.redirect === '/selectedWinner.html') {
+      if (data.redirect === '/winner.html') {
         localStorage.setItem('winnerData', JSON.stringify(data));
         window.location.href = '/selectedWinner.html';
       } else {
@@ -987,12 +945,42 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     alert('Something went wrong checking winner');
     console.error(err);
   }
+
 });
 
 
 
 
 
+// document.addEventListener("DOMContentLoaded", () => {
+//   console.log("DOMContentLoaded triggered — fetching active post...");
+//   fetchgetActivePost(); // This will now setup event listeners after post is loaded
+// });
+
+// });
+
+
+
+// function startCountdown(drawTime) {
+//   const countdownDate = drawTime.getTime();
+//   const timerElement = document.getElementById("timer");
+
+//   const x = setInterval(function () {
+//     const now = new Date().getTime();
+//     const distance = countdownDate - now;
+
+//     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+//     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+//     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+//     timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+
+//     if (distance < 0) {
+//       clearInterval(x);
+//       timerElement.innerHTML = "00h 00m 00s";
+//     }
+//   }, 1000);
+// }
 
 // Countdown function
 function startCountdown(drawTime) {
