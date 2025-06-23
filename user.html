@@ -358,54 +358,282 @@ fetchNotifications();
 
 
   <!-- Hero Section -->
-  <section class="hero">   
+   <!--
+ <section class="hero">   
   <div class="hero-overlay" id="heroOverlay">
     <div class="hero-content">
-      <!-- <img id="heroImage" src="" alt="Hero Image" style="width: 100%; height: auto; border-radius: 8px;" /> -->
-      
       <h1 id="heroTitle">Loading...</h1>
       <p id="heroSubtitle">Please wait</p>
       <a id="heroCta" href="#" class="btn-enter">Loading...</a>
-
       <p class="stake-amount">Stake Amount: ₦<span id="stakeAmount">0</span></p>
-
+-->
       <!-- 👇 Reactions -->
-      <div class="reactions">
-        <button class="emoji-btn" data-emoji="👍">👍</button>
-        <button class="emoji-btn" data-emoji="❤️">❤️</button>
-        <button class="emoji-btn" data-emoji="😂">😂</button>
-        <button class="emoji-btn" data-emoji="🔥">🔥</button>
+<!--
+      <div class="post" data-post-id="68506c2a3be3f726f630eedd">
+        <div class="reactions">
+      <button class="emoji-btn" data-emoji="like">👍 <span class="emoji-count" data-emoji="like">0</span></button>
+      <button class="emoji-btn" data-emoji="love">❤️ <span class="emoji-count" data-emoji="love">0</span></button>
+      <button class="emoji-btn" data-emoji="haha">😂 <span class="emoji-count" data-emoji="haha">0</span></button>
+       <button class="emoji-btn" data-emoji="wow">🔥 <span class="emoji-count" data-emoji="wow">0</span></button>
+        </div>
       </div>
-
-      <!-- 👇 Share -->
+-->
+      <!-- ✅ Move these inside -->
+       <!--
       <div class="share-section">
         <button onclick="shareHeroPost()">🔗 Share</button>
       </div>
 
-      <!-- 👇 Comments -->
-      <div class="comments-section">
-        <form id="commentForm">
-          <input type="text" id="commentInput" placeholder="Write a comment..." required />
-          <button type="submit">Post</button>
-        </form>
-        <div id="commentsList">
-          <!-- Comments will be dynamically inserted here -->
+      <div class="post" data-post-id="68506c2a3be3f726f630eedd">
+        <button class="toggle-comments-btn">👁️ View Comments</button>
+        <div class="comments-section" style="display: none;">
+          <form class="comment-form">
+            <input type="text" class="comment-input" placeholder="Write a comment..." required />
+            <button type="submit">Post</button>
+          </form>
+          <div class="comments-list"></div>
         </div>
       </div>
-    </div>   
+-->
+   <!--  </div> --><!--  now everything is inside .hero-content -->
+    <!--
+  </div>
+</section>
+-->
+
+<!-- Hero Section -->
+<section class="hero">   
+  <div class="hero-overlay" id="heroOverlay">
+    <div class="hero-content">
+      <h1 id="heroTitle">Loading...</h1>
+      <p id="heroSubtitle">Please wait</p>
+      <a id="heroCta" href="#" class="btn-enter">Loading...</a>
+      <!-- Add the draw/check winner button, hidden by default -->
+      <button id="checkWinnerBtn" style="display:none;" class="btn-enter">Check Draw Potential Winner!</button>
+      <!-- Add the timer display -->
+      <p class="stake-amount">Stake Amount: ₦<span id="stakeAmount">0</span></p>
+      <p id="timer" style="font-weight:bold;"></p>
+
+      <!-- 👇 Reactions -->
+      <div class="post" data-post-id="68506c2a3be3f726f630eedd">
+        <div class="reactions">
+          <button class="emoji-btn" data-emoji="like">👍 <span class="emoji-count" data-emoji="like">0</span></button>
+          <button class="emoji-btn" data-emoji="love">❤️ <span class="emoji-count" data-emoji="love">0</span></button>
+          <button class="emoji-btn" data-emoji="haha">😂 <span class="emoji-count" data-emoji="haha">0</span></button>
+          <button class="emoji-btn" data-emoji="wow">🔥 <span class="emoji-count" data-emoji="wow">0</span></button>
+        </div>
+      </div>
+
+      <div class="share-section">
+        <button onclick="shareHeroPost()">🔗 Share</button>
+      </div>
+
+      <div class="post" data-post-id="68506c2a3be3f726f630eedd">
+        <button class="toggle-comments-btn">👁️ View Comments</button>
+        <div class="comments-section" style="display: none;">
+          <form class="comment-form">
+            <input type="text" class="comment-input" placeholder="Write a comment..." required />
+            <button type="submit">Post</button>
+          </form>
+          <div class="comments-list"></div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 
 
+<script>// Function to view comments for a post
+document.addEventListener('DOMContentLoaded', function() {
 
-<script> // Hero Section comment and reaction functionality
+document.querySelectorAll('.toggle-comments-btn').forEach(button => {
+  button.addEventListener('click', async function () {
+    const postContainer = this.closest('.post');
+    const postId = postContainer.dataset.postId;
+    const commentsSection = postContainer.querySelector('.comments-section');
+    const commentsList = postContainer.querySelector('.comments-list');
+
+    // Toggle visibility
+    const isVisible = commentsSection.style.display === 'block';
+    commentsSection.style.display = isVisible ? 'none' : 'block';
+
+    if (!isVisible) {
+      await loadComments(postId, commentsList);
+    }
+  });
+});
+
+
+
+
+// Function to handle emoji reactions
+
+console.log("Reaction script loaded");
+
+document.querySelectorAll(".post").forEach((postElement) => {
+  const postId = postElement.dataset.postId;
+  console.log("Found post with ID:", postId);
+  
+  if (!postId) {
+    console.error("Post element missing data-post-id:", postElement);
+    return;
+  }
+
+  postElement.querySelectorAll(".emoji-btn").forEach((btn) => {
+    console.log("Found emoji button:", btn);
+    
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault(); // Prevent any default behavior
+      console.log("Emoji button clicked!");
+      
+      const emoji = btn.getAttribute("data-emoji");
+      console.log("Emoji:", emoji, "PostId:", postId);
+
+      // Check if user is authenticated
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please log in to react to posts");
+        return;
+      }
+
+      try {
+        console.log("Sending reaction request...");
+        
+        const res = await fetch("https://pch-z6ny.onrender.com/api/user/react", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            postId,
+            emoji,
+            postType: "HeroPost",
+          }),
+        });
+
+        console.log("Response status:", res.status);
+        const data = await res.json();
+        console.log("Response data:", data);
+
+        if (res.ok) {
+          console.log("Reaction successful, updating counts...");
+          updateReactionCounts(postElement, postId);
+        } else {
+          console.error("Reaction failed:", data);
+          alert(data.error || data.message || "Reaction failed");
+        }
+      } catch (err) {
+        console.error("Reaction error:", err);
+        alert("Error reacting to post");
+      }
+    });
+  });
+
+  // Load initial counts
+  updateReactionCounts(postElement, postId);
+});
+
+// Function to update reaction counts for a post
+async function updateReactionCounts(postElement, postId) {
+  try {
+    console.log("Fetching reaction counts for post:", postId);
+    
+    const res = await fetch(`https://pch-z6ny.onrender.com/api/user/HeroPost/${postId}`);
+    console.log("Counts response status:", res.status);
+    
+    if (!res.ok) {
+      console.error("Failed to fetch reaction counts:", res.status);
+      return;
+    }
+
+    const reactionData = await res.json();
+    console.log("Reaction counts:", reactionData);
+
+    const countSpans = postElement.querySelectorAll(".emoji-count");
+    console.log("Found count spans:", countSpans.length);
+
+    countSpans.forEach(span => {
+      const emoji = span.getAttribute("data-emoji");
+      const count = reactionData[emoji] || 0;
+      span.textContent = count;
+      console.log(`Updated ${emoji} count to:`, count);
+    });
+  } catch (err) {
+    console.error("Failed to load reaction counts", err);
+  }
+}
+
+}); // End of DOMContentLoaded listener
+
+
+
+
+
+
+// Hero Section comment and reaction functionality
 
 
  // Function to fetch the latest post from the backend
 
+// let currentPostId = ""; // Set after fetching the hero post
+
+//    async function fetchgetActivePost() {
+//   console.log('Fetching active post...');
+//   try {
+//     const response = await fetch('https://pch-z6ny.onrender.com/api/post/active?_=' + new Date().getTime());
+//     console.log('Post fetch request sent...');
+    
+//     if (!response.ok) {
+//       throw new Error('Failed to fetch latest post');
+//     }
+
+//     const data = await response.json();
+//     if (!data || !data.post) {
+//       throw new Error('No post data found');
+//     }
+
+//     const post = data.post;
+//     currentPostId = post._id; //  Set this here AFTER fetching `data`
+
+//     console.log('Latest post fetched:', post);
+
+//     document.getElementById('heroTitle').innerText = post.title || "Loading...";
+//     document.getElementById('heroSubtitle').innerText = post.subtitle || "Please wait";
+
+//     const heroCta = document.getElementById('heroCta');
+//     heroCta.innerText = post.ctaText || "Loading...";
+//     heroCta.href = post.ctaLink || "#";
+
+//     const drawTime = post.drawAvailableUntil ? new Date(post.drawAvailableUntil) : null;
+// if (drawTime) startCountdown(drawTime);
+
+//     document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
+
+//     const heroOverlay = document.getElementById('heroOverlay');
+//    if (post.heroImage) {
+//   let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
+// console.log("Raw heroImage from DB:", post.heroImage);
+
+//   console.log("Final hero image URL:", imageUrl);
+
+//   const hero = document.querySelector('.hero');
+//   hero.style.backgroundImage = `url(${imageUrl})`;
+//   hero.style.backgroundSize = 'cover';
+//   hero.style.backgroundPosition = 'center';
+// } else {
+//   console.error("No image URL found in the post data");
+// }
+
+//   } catch (error) {
+//     console.error('Error fetching latest post:', error);
+//   }
+// }
+
 let currentPostId = ""; // Set after fetching the hero post
 
-   async function fetchgetActivePost() {
+async function fetchgetActivePost() {
   console.log('Fetching active post...');
   try {
     const response = await fetch('https://pch-z6ny.onrender.com/api/post/active?_=' + new Date().getTime());
@@ -421,7 +649,7 @@ let currentPostId = ""; // Set after fetching the hero post
     }
 
     const post = data.post;
-    currentPostId = post._id; //  Set this here AFTER fetching `data`
+    currentPostId = post._id;
 
     console.log('Latest post fetched:', post);
 
@@ -429,33 +657,44 @@ let currentPostId = ""; // Set after fetching the hero post
     document.getElementById('heroSubtitle').innerText = post.subtitle || "Please wait";
 
     const heroCta = document.getElementById('heroCta');
-    heroCta.innerText = post.ctaText || "Loading...";
-    heroCta.href = post.ctaLink || "#";
+    const checkWinnerBtn = document.getElementById('checkWinnerBtn'); // Ensure this exists in your HTML
 
-    const drawTime = new Date(post.drawDeadline);
-    startCountdown(drawTime);
+    // Show/hide CTA and Draw button based on draw state
+    if (post.isDrawTime && post.drawAvailableUntil) {
+      heroCta.style.display = "none";
+      if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
+      // Start countdown for drawAvailableUntil
+      const drawTime = new Date(post.drawAvailableUntil);
+      startCountdown(drawTime);
+    } else {
+      heroCta.innerText = post.ctaText || "Stake Now";
+      heroCta.style.display = "block";
+      if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
+      // Optionally, clear or reset countdown here if needed
+    }
 
     document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
 
     const heroOverlay = document.getElementById('heroOverlay');
-   if (post.heroImage) {
-  let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
-console.log("Raw heroImage from DB:", post.heroImage);
+    if (post.heroImage) {
+      let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
+      console.log("Raw heroImage from DB:", post.heroImage);
+      console.log("Final hero image URL:", imageUrl);
 
-  console.log("Final hero image URL:", imageUrl);
-
-  const hero = document.querySelector('.hero');
-  hero.style.backgroundImage = `url(${imageUrl})`;
-  hero.style.backgroundSize = 'cover';
-  hero.style.backgroundPosition = 'center';
-} else {
-  console.error("No image URL found in the post data");
-}
+      const hero = document.querySelector('.hero');
+      hero.style.backgroundImage = `url(${imageUrl})`;
+      hero.style.backgroundSize = 'cover';
+      hero.style.backgroundPosition = 'center';
+    } else {
+      console.error("No image URL found in the post data");
+    }
 
   } catch (error) {
     console.error('Error fetching latest post:', error);
   }
 }
+
+
 
 
  document.addEventListener("DOMContentLoaded", () => {
@@ -464,68 +703,126 @@ console.log("Raw heroImage from DB:", post.heroImage);
 
   fetchgetActivePost();
 
-    const commentForm = document.getElementById("commentForm");
-    const commentInput = document.getElementById("commentInput");
-    const commentsList = document.getElementById("commentsList");
+document.querySelectorAll('.comment-form').forEach(form => {
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
 
+    const postContainer = form.closest('.post');
+    const postId = postContainer.dataset.postId;
+    const commentInput = form.querySelector('.comment-input');
+    const commentsList = postContainer.querySelector('.comments-list');
+    const comment = commentInput.value.trim();
     const postType = "HeroPost";
 
-    if (commentForm) {
-    commentForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const comment = commentInput.value.trim();
-      if (!comment) return;
+    if (!comment) return;
 
-      try {
-        const res = await fetch("https://pch-z6ny.onrender.com/api/user/comment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}` // if protected route
-          },
-          body: JSON.stringify({ comment, postId: currentPostId, postType })
-        });
+    try {
+      const res = await fetch("https://pch-z6ny.onrender.com/api/user/comment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ comment, postId, postType })
+      });
 
+      if (res.ok) {
+        commentInput.value = "";
+        await loadComments(postId, commentsList); // Refresh that specific post's comments
+      } else {
         const data = await res.json();
-
-        if (res.ok) {
-          commentInput.value = "";
-          loadComments(); // reload comments
-        } else {
-          alert(data.message || "Failed to post comment.");
-        }
-      } catch (err) {
-        console.error("Comment submit error:", err);
-        alert("An error occurred while submitting the comment.");
+        alert(data.message || "Failed to post comment.");
       }
-    });
+    } catch (err) {
+      console.error("Comment submit error:", err);
+      alert("An error occurred while submitting the comment.");
     }
   });
+});
+});
 
 
-     async function loadComments() {
-      try {
-        const res = await fetch("https://pch-z6ny.onrender.com/api/user/comments?postId=" + currentPostId);
-        const comments = await res.json();
 
-        commentsList.innerHTML = ""; // clear old
-        comments.forEach(c => {
-          const div = document.createElement("div");
-          div.className = "comment";
-          div.textContent = c.comment; // adjust as needed
-          commentsList.appendChild(div);
-        });
+async function loadComments(postId, commentsListElement) {
+  try {
+    const res = await fetch(`https://pch-z6ny.onrender.com/api/user/comments?postId=${postId}`);
+    const comments = await res.json();
 
-      } catch (err) {
-        console.error("Failed to load comments:", err);
-      }
+    commentsListElement.innerHTML = "";
+
+    if (!Array.isArray(comments) || comments.length === 0) {
+      commentsListElement.innerHTML = "<p>No comments yet.</p>";
+      return;
     }
 
+    // Sort latest first
+    comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // Limit to 5
+    const latestComments = comments.slice(0, 5);
+
+    latestComments.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "comment";
+      div.innerHTML = `
+        <div class="meta">User: ${c.userId.slice(0, 8)}...</div>
+        <div class="text">${c.comment}</div>
+        <div class="timestamp">${new Date(c.createdAt).toLocaleString()}</div>
+      `;
+      commentsListElement.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error("Failed to load comments:", err);
+    commentsListElement.innerHTML = "<p style='color:red;'>Error loading comments.</p>";
+  }
+}
 
 
 
+
+// document.getElementById('heroCta').addEventListener('click', async (e) => {
+//   e.preventDefault(); // Stop default anchor behavior
+
+//   const token = localStorage.getItem('token');
+//   if (!token) {
+//     alert("Please log in to stake.");
+//     return window.location.href = "/login.html";
+//   }
+
+//   try {
+//     const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/play/${currentPostId}`, {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${token}`,
+//         'Content-Type': 'application/json' //  Always include
+//       }
+//     });
+
+//     const data = await res.json();
+
+//     if (res.ok) {
+//       //  Successful stake — show confirmation
+//       alert(`You have successfully staked for "${data.message}".\n\nCheck back to click a draw button — it could be you!\n\nThe more you play, the better your chances of winning.`);
+//       window.location.href = data.redirect || "/user.html";
+//     } else {
+//       //  Failed stake
+//       alert(data.message || "Something went wrong.");
+//       if (data.redirect) {
+//         window.location.href = data.redirect;
+//       }
+//     }
+
+//   } catch (err) {
+//     console.error("CTA stake error:", err);
+//     alert("An unexpected error occurred. Please try again.");
+//   }
+// });
+
+
+// Stake CTA
 document.getElementById('heroCta').addEventListener('click', async (e) => {
-  e.preventDefault(); // Stop default anchor behavior
+  e.preventDefault();
 
   const token = localStorage.getItem('token');
   if (!token) {
@@ -538,18 +835,16 @@ document.getElementById('heroCta').addEventListener('click', async (e) => {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json' //  Always include
+        'Content-Type': 'application/json'
       }
     });
 
     const data = await res.json();
 
     if (res.ok) {
-      //  Successful stake — show confirmation
       alert(`You have successfully staked for "${data.message}".\n\nCheck back to click a draw button — it could be you!\n\nThe more you play, the better your chances of winning.`);
       window.location.href = data.redirect || "/user.html";
     } else {
-      //  Failed stake
       alert(data.message || "Something went wrong.");
       if (data.redirect) {
         window.location.href = data.redirect;
@@ -565,9 +860,129 @@ document.getElementById('heroCta').addEventListener('click', async (e) => {
 
 
 
-    
+
+//  //<!-- This JavaScript should run when the user clicks “Check Draw Potential Winner!” -->
  
 
+// document.getElementById('checkWinnerBtn').addEventListener('click', async () => {
+//   const postId = currentPostId; // or however you're storing it
+//     console.log("Using postId:", postId); // Debug log
+
+//   if (!postId) {
+//     alert('No post available for draw check');
+//     return;
+//   }
+
+//   try {
+//     const token = localStorage.getItem('token');
+//     const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/draw/${postId}`, {
+//       method: 'GET',
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//          'Content-Type': 'application/json'
+//       }
+//     });
+
+//     const data = await res.json();
+
+//     console.log("Draw response:", data);
+
+//       if (res.ok) {
+//       if (data.isWinner || data.redirect === '/winner.html') {
+//         localStorage.setItem('winnerData', JSON.stringify(data));
+//         window.location.href = '/selectedWinner.html';
+//       } else {
+//         localStorage.setItem('winnerData', JSON.stringify(data));
+//         window.location.href = '/betterluck.html';
+//       }
+//     } else {
+//       alert(data.message || 'Failed to check draw results');
+//     }
+
+//   } catch (err) {
+//     alert('Something went wrong checking winner');
+//     console.error(err);
+//   }
+
+
+// Draw/check winner button
+document.getElementById('checkWinnerBtn').addEventListener('click', async () => {
+  const postId = currentPostId;
+  console.log("Using postId:", postId);
+
+  if (!postId) {
+    alert('No post available for draw check');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/draw/${postId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await res.json();
+
+    console.log("Draw response:", data);
+
+    if (res.ok) {
+      if (data.redirect === '/winner.html') {
+        localStorage.setItem('winnerData', JSON.stringify(data));
+        window.location.href = '/selectedWinner.html';
+      } else {
+        localStorage.setItem('winnerData', JSON.stringify(data));
+        window.location.href = '/betterluck.html';
+      }
+    } else {
+      alert(data.message || 'Failed to check draw results');
+    }
+
+  } catch (err) {
+    alert('Something went wrong checking winner');
+    console.error(err);
+  }
+
+});
+
+
+
+
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   console.log("DOMContentLoaded triggered — fetching active post...");
+//   fetchgetActivePost(); // This will now setup event listeners after post is loaded
+// });
+
+// });
+
+
+
+// function startCountdown(drawTime) {
+//   const countdownDate = drawTime.getTime();
+//   const timerElement = document.getElementById("timer");
+
+//   const x = setInterval(function () {
+//     const now = new Date().getTime();
+//     const distance = countdownDate - now;
+
+//     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+//     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+//     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+//     timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+
+//     if (distance < 0) {
+//       clearInterval(x);
+//       timerElement.innerHTML = "00h 00m 00s";
+//     }
+//   }, 1000);
+// }
+
+// Countdown function
 function startCountdown(drawTime) {
   const countdownDate = drawTime.getTime();
   const timerElement = document.getElementById("timer");
@@ -585,87 +1000,13 @@ function startCountdown(drawTime) {
     if (distance < 0) {
       clearInterval(x);
       timerElement.innerHTML = "00h 00m 00s";
+      // Optionally, refresh the post after draw period ends
+      setTimeout(() => {
+        fetchgetActivePost();
+      }, 2000);
     }
   }, 1000);
 }
-
-
-
-
-
-
-
- //<!-- This JavaScript should run when the user clicks “Check Draw Potential Winner!” -->
- 
-
-document.getElementById('checkWinnerBtn').addEventListener('click', async () => {
-  const postId = localStorage.getItem('selectedPostId'); // or however you're storing it
-
-  try {
-    const token = localStorage.getItem('token');
-    const res = await fetch(`https://pch-z6ny.onrender.com/api/sweepstake/draw/${postId}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const data = await res.json();
-
-    if (data.isWinner) {
-      localStorage.setItem('winnerData', JSON.stringify(data));
-      window.location.href = '/selectedWinner.html';
-    } else {
-      localStorage.setItem('winnerData', JSON.stringify(data));
-      window.location.href = '/betterluck.html';
-    }
-
-  } catch (err) {
-    alert('Something went wrong checking winner');
-    console.error(err);
-  }
-});
-
-  
-// Function to handle emoji reactions
-
-document.querySelectorAll(".emoji-btn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    const emoji = btn.getAttribute("data-emoji");
-
-    if (!currentPostId) {
-      alert("No post selected");
-      return;
-    }
-
-    try {
-      const res = await fetch("https://pch-z6ny.onrender.com/api/user/react", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          postId: currentPostId,
-          emoji,
-          postType: "HeroPost"
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        // Optional: Show a quick popup or count update
-        alert(`You reacted with ${emoji}!`);
-      } else {
-        alert(data.message || "Reaction failed");
-      }
-    } catch (err) {
-      console.error("Reaction error:", err);
-      alert("Error reacting to post");
-    }
-  });
-});
 
 
 
@@ -679,7 +1020,7 @@ function shareHeroPost() {
   const shareUrl = `https://pch-z6ny.onrender.com/api/user/sharepage/${currentPostId}`;
   
   // For text-based sharing (WhatsApp, Twitter)
-  const message = `${title}\n\n${subtitle}\n\n👉 ${shareUrl}`;
+  const message = `${title}\n\n${subtitle}\n\n ${shareUrl}`;
   const encodedMessage = encodeURIComponent(message);
   const encodedUrl = encodeURIComponent(shareUrl);
   
@@ -726,19 +1067,19 @@ function shareHeroPost() {
           <a href="https://wa.me/?text=${encodedMessage}" 
              target="_blank" 
              style="display: block; padding: 10px; background: #25D366; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
-            📱 WhatsApp
+             WhatsApp
           </a>
           
           <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" 
              target="_blank"
              style="display: block; padding: 10px; background: #1877F2; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
-            📘 Facebook
+             Facebook
           </a>
           
           <a href="https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}" 
              target="_blank"
              style="display: block; padding: 10px; background: #1DA1F2; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
-            🐦 Twitter
+             Twitter
           </a>
           
           <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}" 
@@ -749,13 +1090,13 @@ function shareHeroPost() {
           
           <button onclick="copyShareLink('${shareUrl}')" 
                   style="padding: 10px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
-            📋 Copy Link
+             Copy Link
           </button>
         </div>
         
         <button onclick="document.getElementById('shareOptions')?.remove()" 
                 style="margin-top: 15px; padding: 8px 20px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer;">
-          ❌ Close
+           Close
         </button>
       </div>
       
@@ -780,7 +1121,7 @@ function copyShareLink(url) {
     // Show success message
     const button = event.target;
     const originalText = button.innerHTML;
-    button.innerHTML = '✅ Copied!';
+    button.innerHTML = ' Copied!';
     button.style.background = '#28a745';
     
     setTimeout(() => {
