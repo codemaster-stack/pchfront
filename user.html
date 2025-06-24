@@ -673,16 +673,12 @@ async function fetchgetActivePost() {
     //   // Optionally, clear or reset countdown here if needed
     // }
 
-if (post.stakes && post.stakes.length >= post.maxStakes) {
-  // Hide or disable stake button
+if (post.isDrawTime && post.drawAvailableUntil) {
   heroCta.style.display = "none";
   if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
-  // Start countdown
-  if (post.drawAvailableUntil) {
-    startCountdown(new Date(post.drawAvailableUntil));
-  }
+  const drawTime = new Date(post.drawAvailableUntil);
+  startCountdown(drawTime);
 } else {
-  // Show stake button
   heroCta.style.display = "block";
   if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
 }
