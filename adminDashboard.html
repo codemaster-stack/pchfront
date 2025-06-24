@@ -385,29 +385,29 @@ if (window.location.pathname.includes('admin') && user.role !== 'admin') {
 
 
   
-    // Add preview logic (already explained earlier)
-    const form = document.querySelector(".post-form");
-    const previewBox = document.getElementById("previewBox");
+    // // Add preview logic (already explained earlier)
+    // const form = document.querySelector(".post-form");
+    // const previewBox = document.getElementById("previewBox");
   
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+    // form.addEventListener("submit", function (e) {
+    //   e.preventDefault();
   
-      const title = document.getElementById("title").value;
-      const content = document.getElementById("content").value;
-      const image = document.getElementById("image").files[0];
+    //   const title = document.getElementById("title").value;
+    //   const content = document.getElementById("content").value;
+    //   const image = document.getElementById("image").files[0];
   
-      if (image) {
-        const reader = new FileReader();
-        reader.onload = function () {
-          previewBox.innerHTML = `
-            <h3>${title}</h3>
-            <img src="${reader.result}" alt="Post Image" style="max-width: 100%; border-radius: 8px;" />
-            <p>${content}</p>
-          `;
-        };
-        reader.readAsDataURL(image);
-      }
-    });
+    //   if (image) {
+    //     const reader = new FileReader();
+    //     reader.onload = function () {
+    //       previewBox.innerHTML = `
+    //         <h3>${title}</h3>
+    //         <img src="${reader.result}" alt="Post Image" style="max-width: 100%; border-radius: 8px;" />
+    //         <p>${content}</p>
+    //       `;
+    //     };
+    //     reader.readAsDataURL(image);
+    //   }
+    // });
 
 
 
@@ -772,9 +772,10 @@ document.getElementById('logoutBtn').addEventListener('click', function () {
 
 
 
-  //  This is the new live preview logic (don't remove the above code)
-  const formInputs = ["title", "subtitle", "ctaText", "ctaLink", "stakeAmount", "maxStakes", "image"];
-formInputs.forEach(id => {
+  //  This is the new live preview logic 
+ const previewBox = document.getElementById("previewBox");
+
+["title", "subtitle", "ctaText", "ctaLink", "stakeAmount", "maxStakes", "image"].forEach(id => {
   const el = document.getElementById(id);
   if (el) {
     el.addEventListener(id === "image" ? "change" : "input", updatePreview);
@@ -788,10 +789,10 @@ function updatePreview() {
   const ctaLink = document.getElementById("ctaLink").value;
   const stakeAmount = document.getElementById("stakeAmount").value;
   const maxStakes = document.getElementById("maxStakes").value;
-  const image = document.getElementById("image").files[0];
-  const previewBox = document.getElementById("previewBox");
+  const imageInput = document.getElementById("image");
+  const image = imageInput && imageInput.files[0];
 
-  let previewHTML = `
+  let html = `
     <h3>${title}</h3>
     <p><strong>${subtitle}</strong></p>
     <a href="${ctaLink}" class="cta-button">${ctaText}</a>
@@ -802,15 +803,13 @@ function updatePreview() {
   if (image) {
     const reader = new FileReader();
     reader.onload = function () {
-      previewBox.innerHTML = previewHTML + `<img src="${reader.result}" alt="Hero Image" style="max-width: 100%; border-radius: 8px;" />`;
+       previewBox.innerHTML = html + `<img src="${reader.result}" alt="Hero Image" style="max-width: 100%; border-radius: 8px;" />`;
     };
     reader.readAsDataURL(image);
   } else {
-    previewBox.innerHTML = previewHTML;
+    previewBox.innerHTML = html;
   }
 }
-
-
 
       // Fetch Latest Admin Post
  
