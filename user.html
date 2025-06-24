@@ -407,7 +407,7 @@ fetchNotifications();
     <div class="hero-content">
       <h1 id="heroTitle">Loading...</h1>
       <p id="heroSubtitle">Please wait</p>
-     <button id="heroCta" type="button" class="btn-enter">Loading...</button>
+      <a id="heroCta" href="#" class="btn-enter">Loading...</a>
       <!-- Add the draw/check winner button, hidden by default -->
       <button id="checkWinnerBtn" style="display:none;" class="btn-enter">Check Draw Potential Winner!</button>
       <!-- Add the timer display -->
@@ -634,55 +634,66 @@ async function updateReactionCounts(postElement, postId) {
 let currentPostId = ""; // Set after fetching the hero post
 
 async function fetchgetActivePost() {
+  console.log('Fetching active post...');
   try {
     const response = await fetch('https://pch-z6ny.onrender.com/api/post/active?_=' + new Date().getTime());
-    if (!response.ok) throw new Error('Failed to fetch active post');
+    console.log('Post fetch request sent...');
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch latest post');
+    }
+
     const data = await response.json();
-    if (!data || !data.post) throw new Error('No post data found');
+    if (!data || !data.post) {
+      throw new Error('No post data found');
+    }
+
     const post = data.post;
     currentPostId = post._id;
 
-    // After setting currentPostId in fetchgetActivePost:
-document.querySelectorAll('.post').forEach(div => {
-  div.setAttribute('data-post-id', currentPostId);
-});
+    console.log('Latest post fetched:', post);
 
     document.getElementById('heroTitle').innerText = post.title || "Loading...";
     document.getElementById('heroSubtitle').innerText = post.subtitle || "Please wait";
-    document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
 
-    // Show/hide CTA and Draw button based on post.status
     const heroCta = document.getElementById('heroCta');
-    const checkWinnerBtn = document.getElementById('checkWinnerBtn');
-    if (post.status === 'active') {
+    const checkWinnerBtn = document.getElementById('checkWinnerBtn'); // Ensure this exists in your HTML
+
+    // Show/hide CTA and Draw button based on draw state
+    if (post.isDrawTime && post.drawDeadline) {
+      heroCta.style.display = "none";
+      if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
+      // Start countdown for drawAvailableUntil
+      const drawTime = new Date(post.drawDeadline);
+      startCountdown(drawTime);
+    } else {
       heroCta.innerText = post.ctaText || "Stake Now";
       heroCta.style.display = "block";
       if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
-      document.getElementById("timer").innerText = "";
-    } else if (post.status === 'draw_pending' && post.drawDeadline) {
-      heroCta.style.display = "none";
-      if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
-      startCountdown(new Date(post.drawDeadline));
-    } else {
-      heroCta.style.display = "none";
-      if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
-      document.getElementById("timer").innerText = "";
+      // Optionally, clear or reset countdown here if needed
     }
 
-    // Set hero image as background
+    document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
+
+    const heroOverlay = document.getElementById('heroOverlay');
     if (post.heroImage) {
       let imageUrl = post.heroImage.trim().replace(/\\/g, '/');
-      document.querySelector('.hero').style.backgroundImage = `url(${imageUrl})`;
-      document.querySelector('.hero').style.backgroundSize = 'cover';
-      document.querySelector('.hero').style.backgroundPosition = 'center';
+      console.log("Raw heroImage from DB:", post.heroImage);
+      console.log("Final hero image URL:", imageUrl);
+
+      const hero = document.querySelector('.hero');
+      hero.style.backgroundImage = `url(${imageUrl})`;
+      hero.style.backgroundSize = 'cover';
+      hero.style.backgroundPosition = 'center';
+    } else {
+      console.error("No image URL found in the post data");
     }
+
   } catch (error) {
-    console.error('Error fetching active post:', error);
-    document.getElementById('heroTitle').innerText = "No active hero post.";
-    document.getElementById('heroSubtitle').innerText = "";
-    document.getElementById('stakeAmount').innerText = "0";
+    console.error('Error fetching latest post:', error);
   }
 }
+
 
 
 
@@ -915,11 +926,11 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     });
 
     const data = await res.json();
-
     console.log("Draw response:", data);
 
     if (res.ok) {
-      if (data.redirect === '/winner.html') {
+      // Check if user is winner using isWinner property or redirect
+      if (data.isWinner === true || data.redirect === '/selectedWinner.html') {
         localStorage.setItem('winnerData', JSON.stringify(data));
         window.location.href = '/selectedWinner.html';
       } else {
@@ -934,9 +945,7 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
     alert('Something went wrong checking winner');
     console.error(err);
   }
-
 });
-
 
 
 
