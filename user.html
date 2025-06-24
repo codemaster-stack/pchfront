@@ -660,18 +660,32 @@ async function fetchgetActivePost() {
     const checkWinnerBtn = document.getElementById('checkWinnerBtn'); // Ensure this exists in your HTML
 
     // Show/hide CTA and Draw button based on draw state
-    if (post.isDrawTime && post.drawDeadline) {
-      heroCta.style.display = "none";
-      if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
-      // Start countdown for drawAvailableUntil
-      const drawTime = new Date(post.drawDeadline);
-      startCountdown(drawTime);
-    } else {
-      heroCta.innerText = post.ctaText || "Stake Now";
-      heroCta.style.display = "block";
-      if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
-      // Optionally, clear or reset countdown here if needed
-    }
+    // if (post.isDrawTime && post.drawDeadline) {
+    //   heroCta.style.display = "none";
+    //   if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
+    //   // Start countdown for drawAvailableUntil
+    //   const drawTime = new Date(post.drawDeadline);
+    //   startCountdown(drawTime);
+    // } else {
+    //   heroCta.innerText = post.ctaText || "Stake Now";
+    //   heroCta.style.display = "block";
+    //   if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
+    //   // Optionally, clear or reset countdown here if needed
+    // }
+
+if (post.isDrawTime && post.drawAvailableUntil) {
+  heroCta.style.display = "none";
+  if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
+  // Start countdown for drawAvailableUntil
+  const drawTime = new Date(post.drawAvailableUntil); // <-- FIXED
+  startCountdown(drawTime);
+} else {
+  heroCta.innerText = post.ctaText || "Stake Now";
+  heroCta.style.display = "block";
+  if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
+  // Optionally, clear or reset countdown here if needed
+}
+
 
     document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
 
