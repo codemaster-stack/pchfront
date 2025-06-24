@@ -407,7 +407,7 @@ fetchNotifications();
     <div class="hero-content">
       <h1 id="heroTitle">Loading...</h1>
       <p id="heroSubtitle">Please wait</p>
-      <a id="heroCta" href="#" class="btn-enter">Loading...</a>
+     <button id="heroCta" type="button" class="btn-enter">Loading...</button>
       <!-- Add the draw/check winner button, hidden by default -->
       <button id="checkWinnerBtn" style="display:none;" class="btn-enter">Check Draw Potential Winner!</button>
       <!-- Add the timer display -->
@@ -641,6 +641,11 @@ async function fetchgetActivePost() {
     if (!data || !data.post) throw new Error('No post data found');
     const post = data.post;
     currentPostId = post._id;
+
+    // After setting currentPostId in fetchgetActivePost:
+document.querySelectorAll('.post').forEach(div => {
+  div.setAttribute('data-post-id', currentPostId);
+});
 
     document.getElementById('heroTitle').innerText = post.title || "Loading...";
     document.getElementById('heroSubtitle').innerText = post.subtitle || "Please wait";
