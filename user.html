@@ -672,16 +672,19 @@ async function fetchgetActivePost() {
     //   if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
     //   // Optionally, clear or reset countdown here if needed
     // }
-
 if (post.isDrawTime && post.drawAvailableUntil) {
   heroCta.style.display = "none";
   if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
   const drawTime = new Date(post.drawAvailableUntil);
   startCountdown(drawTime);
+} else if (post.stakes && post.stakes.length >= post.maxStakes) {
+  // If max stakes reached but draw not started yet (should be rare)
+  heroCta.style.display = "none";
+  if (checkWinnerBtn) checkWinnerBtn.style.display = "block";
 } else {
   heroCta.style.display = "block";
   if (checkWinnerBtn) checkWinnerBtn.style.display = "none";
-}
+}kmk
 
 
     document.getElementById('stakeAmount').innerText = post.stakeAmount || "0";
@@ -992,11 +995,17 @@ document.getElementById('checkWinnerBtn').addEventListener('click', async () => 
 // }
 
 // Countdown function
+
+let countdownInterval;
+
 function startCountdown(drawTime) {
   const countdownDate = drawTime.getTime();
   const timerElement = document.getElementById("timer");
 
-  const x = setInterval(function () {
+  // Clear any previous countdown
+  if (countdownInterval) clearInterval(countdownInterval);
+
+  countdownInterval = setInterval(function () {
     const now = new Date().getTime();
     const distance = countdownDate - now;
 
@@ -1007,7 +1016,7 @@ function startCountdown(drawTime) {
     timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
 
     if (distance < 0) {
-      clearInterval(x);
+      clearInterval(countdownInterval);
       timerElement.innerHTML = "00h 00m 00s";
       // Optionally, refresh the post after draw period ends
       setTimeout(() => {
@@ -1016,7 +1025,6 @@ function startCountdown(drawTime) {
     }
   }, 1000);
 }
-
 
 
 
